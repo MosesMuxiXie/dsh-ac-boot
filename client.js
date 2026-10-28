@@ -78,7 +78,7 @@ window.__ModuleLoader__.load({
       'aria.skip': '跳过开机动画',
       'skip.label': '跳过',
       'hud.op': '行动 // 第一缕光',
-      'hud.build': '版本 14.0 // 本地',
+      'hud.build': '版本 15.0 // 本地',
       'hud.theater': '本地战区 // 06',
       'hud.link': '链路安全',
       'brief.kicker': '战术简报 // 本地战区',
@@ -88,6 +88,8 @@ window.__ModuleLoader__.load({
       'brief.clearance': '简报准备中',
       'theater.kicker': '战区态势',
       'theater.title': '本地战区',
+      'theater.caption': 'LOCAL COMMAND RE-ESTABLISHES THE THEATER LINK. ALL STATIONS REPORT READY.',
+      'theater.caption.zh': '本地指挥部重建战区链路 · 各站报告就绪',
       'intel.header': '目标情报',
       'intel.tgt': '目标',
       'intel.tgt.value': '本地战区',
@@ -125,7 +127,7 @@ window.__ModuleLoader__.load({
       'aria.skip': 'Skip the boot sequence',
       'skip.label': 'SKIP',
       'hud.op': 'OPERATION // FIRST LIGHT',
-      'hud.build': 'BUILD 14.0 // LOCAL',
+      'hud.build': 'BUILD 15.0 // LOCAL',
       'hud.theater': 'LOCAL THEATER // 06',
       'hud.link': 'LINK SECURE',
       'brief.kicker': 'TACTICAL BRIEFING // LOCAL THEATER',
@@ -135,6 +137,8 @@ window.__ModuleLoader__.load({
       'brief.clearance': 'AWAITING BRIEFING',
       'theater.kicker': 'THEATER OVERVIEW',
       'theater.title': 'LOCAL THEATER',
+      'theater.caption': 'LOCAL COMMAND RE-ESTABLISHES THE THEATER LINK. ALL STATIONS REPORT READY.',
+      'theater.caption.zh': '本地指挥部重建战区链路 · 各站报告就绪',
       'intel.header': 'TGT INFO',
       'intel.tgt': 'TGT',
       'intel.tgt.value': 'LOCAL THEATER',
@@ -236,263 +240,292 @@ window.__ModuleLoader__.load({
       }
     }
 
-    // Fictional theater landmass. The tactical map is original linework; the
-    // Agnes terrain texture is clipped inside it.
-    const CONTINENT =
-      'M 260 300 C 240 250 300 210 355 225 C 395 175 490 185 520 235 ' +
-      'C 585 195 675 205 710 250 C 780 230 835 265 855 320 C 925 330 965 290 1025 315 ' +
-      'C 1090 310 1130 355 1165 395 C 1235 395 1285 430 1300 485 C 1360 505 1375 565 1330 605 ' +
-      'C 1360 660 1320 715 1255 715 C 1220 765 1145 780 1095 750 C 1045 790 965 780 925 740 ' +
-      'C 870 775 800 760 765 720 C 710 750 640 730 615 690 C 555 710 495 680 475 640 ' +
-      'C 420 660 360 625 350 585 C 295 570 275 520 295 480 C 250 455 250 395 295 385 ' +
-      'C 265 355 265 320 260 300 Z';
+    // Fictional theater. Coastlines are procedurally generated (never real
+    // geography); the interface is a holographic mission overlay: graticule,
+    // satellite rails, highlighted sector, city tags and data-node bursts.
+    // The Agnes terrain texture is clipped inside the main landmass only.
+    function seeded(seed) {
+      let state = seed >>> 0;
+      return function () {
+        state = (state * 1664525 + 1013904223) >>> 0;
+        return state / 4294967296;
+      };
+    }
 
-    const REGIONS = [
-      { d: 'M 290 250 L 700 225 L 765 455 L 410 570 Z', fill: 'rgba(44,150,170,.2)' },
-      { d: 'M 700 225 L 1050 300 L 1080 520 L 765 455 Z', fill: 'rgba(60,180,195,.16)' },
-      { d: 'M 410 570 L 765 455 L 905 700 L 555 705 Z', fill: 'rgba(40,140,165,.18)' },
-      { d: 'M 765 455 L 1080 520 L 1180 705 L 905 700 Z', fill: 'rgba(70,190,205,.13)' },
+    function blobPath(cx, cy, radius, seed, options) {
+      const rand = seeded(seed);
+      const opts = options || {};
+      const harmonics = [];
+      for (let k = 2; k <= 7; k += 1) {
+        harmonics.push({
+          k: k,
+          amp: (0.05 + rand() * 0.13) / Math.pow(k, 0.72),
+          phase: rand() * Math.PI * 2,
+        });
+      }
+      const elongation = opts.elongation || 1;
+      const rotation = opts.rotation || 0;
+      const steps = 150;
+      const parts = [];
+      for (let i = 0; i < steps; i += 1) {
+        const angle = (i / steps) * Math.PI * 2;
+        let r = 1;
+        for (let index = 0; index < harmonics.length; index += 1) {
+          r += harmonics[index].amp * Math.sin(harmonics[index].k * angle + harmonics[index].phase);
+        }
+        r += (rand() - 0.5) * 0.03;
+        const lx = Math.cos(angle) * radius * r * elongation;
+        const ly = Math.sin(angle) * radius * r;
+        const x = cx + lx * Math.cos(rotation) - ly * Math.sin(rotation);
+        const y = cy + lx * Math.sin(rotation) + ly * Math.cos(rotation);
+        parts.push((i === 0 ? 'M ' : 'L ') + x.toFixed(1) + ' ' + y.toFixed(1));
+      }
+      parts.push('Z');
+      return parts.join(' ');
+    }
+
+    const LANDS = [
+      { key: 'main', d: blobPath(985, 430, 268, 11, { elongation: 1.62, rotation: -0.12 }), major: true },
+      { key: 'west', d: blobPath(268, 305, 172, 23, { elongation: 1.34, rotation: 0.22 }), major: true },
+      { key: 'south', d: blobPath(625, 848, 148, 37, { elongation: 1.75, rotation: 0.06 }), major: true },
+      { key: 'north', d: blobPath(1128, 62, 118, 41, { elongation: 1.45, rotation: -0.42 }), major: true },
+      { key: 'east', d: blobPath(1452, 474, 82, 53, { elongation: 1.15, rotation: 0.58 }), major: false },
+      { key: 'is1', d: blobPath(1462, 706, 58, 67, {}), major: false },
+      { key: 'is2', d: blobPath(210, 612, 64, 71, { elongation: 1.3, rotation: -0.3 }), major: false },
+      { key: 'is3', d: blobPath(120, 128, 46, 83, {}), major: false },
+      { key: 'is4', d: blobPath(368, 700, 40, 97, {}), major: false },
+      { key: 'is5', d: blobPath(842, 96, 44, 101, {}), major: false },
+      { key: 'is6', d: blobPath(1250, 792, 62, 103, {}), major: false },
+      { key: 'is7', d: blobPath(1076, 742, 34, 107, {}), major: false },
+      { key: 'is8', d: blobPath(1408, 240, 30, 109, {}), major: false },
+      { key: 'is9', d: blobPath(486, 752, 26, 113, {}), major: false },
+      { key: 'is10', d: blobPath(1512, 350, 22, 127, {}), major: false },
+      { key: 'is11', d: blobPath(668, 96, 24, 131, {}), major: false },
     ];
-    const REGION_GLOWS = [
-      { cx: 500, cy: 390, rx: 300, ry: 220, tone: 'tea' },
-      { cx: 900, cy: 380, rx: 300, ry: 210, tone: 'bright' },
-      { cx: 640, cy: 585, rx: 280, ry: 200, tone: 'tea' },
-      { cx: 980, cy: 600, rx: 260, ry: 190, tone: 'bright' },
+
+    const HIGHLIGHTS = [
+      {
+        key: 'local',
+        d: blobPath(724, 392, 104, 211, { elongation: 1.16, rotation: -0.18 }),
+        clip: 'acbClip-main',
+        label: 'LOCAL THEATER',
+        lx: 724,
+        ly: 352,
+      },
     ];
-    const PRIMARY_SECTOR = 'M 760 300 L 900 460 L 760 620 L 620 460 Z';
 
     const NODES = [
-      { x: 430, y: 330, code: 'TGT-01', en: 'PROFILE', zh: '读取配置' },
-      { x: 640, y: 290, code: 'TGT-02', en: 'SERVICES', zh: '启动服务' },
-      { x: 860, y: 360, code: 'TGT-03', en: 'WORKSPACE', zh: '索引工作区' },
-      { x: 1030, y: 470, code: 'TGT-04', en: 'SESSION', zh: '恢复会话' },
-      { x: 820, y: 600, code: 'TGT-05', en: 'DISPLAY', zh: '界面同步' },
-      { x: 520, y: 560, code: 'TGT-06', en: 'LINK', zh: '链路建立' },
+      { x: 762, y: 392, hub: true, tag: 'TGT-01', name: '' },
+      { x: 1088, y: 338, hub: true, tag: 'TGT-02', name: 'NORTH RIDGE' },
+      { x: 958, y: 598, hub: true, tag: 'TGT-03', name: 'CENTRAL' },
+      { x: 296, y: 302, hub: true, tag: 'TGT-04', name: 'WEST COMMAND' },
+      { x: 646, y: 320, tag: 'TGT-05', name: 'NORTHGATE' },
+      { x: 1218, y: 452, tag: 'TGT-06', name: 'EAST PORT' },
+      { x: 700, y: 566, tag: 'TGT-07', name: 'RIVER' },
+      { x: 1010, y: 690, tag: 'TGT-08', name: 'DELTA' },
+      { x: 1286, y: 344, tag: 'TGT-09', name: 'EAST RIDGE' },
+      { x: 620, y: 828, tag: 'TGT-10', name: 'SOUTH COAST' },
+      { x: 1132, y: 104, tag: 'TGT-11', name: 'NORTH GATE' },
+      { x: 1452, y: 474, tag: 'TGT-12', name: 'EAST ISLE' },
     ];
 
-    const ROUTE =
-      'M 430 330 C 500 300 575 285 640 290 C 730 298 800 320 860 360 ' +
-      'C 930 400 990 430 1030 470 C 960 530 880 580 820 600 ' +
-      'C 720 630 610 600 520 560 C 470 520 430 420 430 330';
+    const CITIES = [
+      { x: 884, y: 262, name: 'NORTHGATE', anchor: 'start' },
+      { x: 1146, y: 404, name: 'PORT ARDEN', anchor: 'start' },
+      { x: 758, y: 650, name: 'HALCYON', anchor: 'start' },
+      { x: 232, y: 250, name: 'WESTPORT', anchor: 'start' },
+      { x: 1186, y: 770, name: 'MERIDIAN', anchor: 'start' },
+      { x: 900, y: 520, name: 'VESPER', anchor: 'start' },
+    ];
+
+    const SAT_ROWS = [
+      'SAT-01  0x3F2A  14:32:08  OK',
+      'SAT-02  0x7C11  14:32:09  OK',
+      'SAT-03  0x2E94  14:32:09  SYNC',
+      'SAT-04  0x91B0  14:32:10  OK',
+      'SAT-05  0x4D6C  14:32:11  OK',
+      'SAT-06  0x08FA  14:32:12  LINK',
+      'SAT-07  0xA31E  14:32:13  OK',
+      'SAT-08  0x5B77  14:32:14  OK',
+      'SAT-09  0xC042  14:32:15  SYNC',
+      'SAT-10  0x1D6B  14:32:16  OK',
+      'SAT-11  0x86E9  14:32:17  OK',
+      'SAT-12  0x33D4  14:32:18  LINK',
+    ];
+
+    const NODE_ROWS = [
+      'TGT-01  LOCAL THEATER  READY',
+      'TGT-02  NORTH RIDGE    READY',
+      'TGT-03  CENTRAL        READY',
+      'TGT-04  WEST COMMAND   READY',
+      'TGT-05  NORTHGATE      READY',
+      'TGT-06  EAST PORT      SYNC',
+    ];
+
+    const PLATE_ROWS = ['LAT   41.2 N', 'LON  118.6 E', 'GRID  06 / OMEGA', 'SEC   41-06', 'ALT   12,400 M', 'UPLINK 3.8 Gb/s'];
+
+    const GRID_ROWS = ['SECTOR 06 // LOCAL', 'ZONE   ALPHA', 'NODES  12 / 12', 'LINK   06 ACTIVE'];
+
+    const GRATICULE_X = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500];
+    const GRATICULE_Y = [100, 200, 300, 400, 500, 600, 700, 800];
 
     function TheaterMap({ t }) {
-      const hash = React.useMemo ? React.useMemo(() => Math.random(), []) : 1;
-      const regions = REGIONS.map(function (region, index) {
-        return h('path', {
-          key: 'region-' + index,
-          d: region.d,
-          fill: region.fill,
-          stroke: region.stroke || 'rgba(127,233,255,.16)',
-          strokeWidth: region.stroke ? 1 : 0.6,
-        });
+      const rand = seeded(4211);
+      const lands = LANDS.map(function (land) {
+        return h(
+          'g',
+          { key: land.key },
+          h('path', { className: 'acb-land-halo', d: land.d }),
+          h('path', { className: 'acb-land', d: land.d }),
+        );
       });
-      const route = h('g', { className: 'acb-map-route' }, [
-        h('path', {
-          key: 'glow',
-          d: ROUTE,
-          fill: 'none',
-          stroke: 'rgba(255,171,74,.35)',
-          strokeWidth: 6,
-          filter: 'url(#acbSoftGlow)',
-        }),
-        h('path', {
-          key: 'dash',
-          d: ROUTE,
-          fill: 'none',
-          stroke: 'rgba(255,196,120,.9)',
-          strokeWidth: 1.6,
-          strokeDasharray: '8 8',
-          className: 'acb-route-dash',
-        }),
-      ]);
-      const nodeGroups = NODES.map(function (node, index) {
+      const clipDefs = LANDS.filter(function (land) {
+        return land.key === 'main' || land.key === 'west' || land.key === 'east';
+      }).map(function (land) {
+        return h('clipPath', { key: 'clip-' + land.key, id: 'acbClip-' + land.key }, h('path', { d: land.d }));
+      });
+      const highlights = HIGHLIGHTS.map(function (item, index) {
+        return h(
+          'g',
+          { key: item.key, clipPath: 'url(#' + item.clip + ')' },
+          h('path', { className: 'acb-highlight-glow', d: item.d, style: { '--acb-i': index } }),
+          h('path', { className: 'acb-highlight', d: item.d }),
+          h('text', { className: 'acb-highlight-label', x: item.lx, y: item.ly, textAnchor: 'middle' }, item.label),
+        );
+      });
+      const graticule = [];
+      for (let i = 0; i < GRATICULE_X.length; i += 1) {
+        const x = GRATICULE_X[i];
+        const major = x % 300 === 100;
+        graticule.push(h('line', { key: 'vx' + x, className: major ? 'major' : '', x1: x, y1: 0, x2: x, y2: 900 }));
+        graticule.push(h('text', { key: 'vxt' + x, x: x + 4, y: 24 }, String(x / 10).padStart(3, '0') + '°E'));
+        graticule.push(h('text', { key: 'vxb' + x, x: x + 4, y: 884 }, String(x / 10).padStart(3, '0') + '°E'));
+      }
+      for (let i = 0; i < GRATICULE_Y.length; i += 1) {
+        const y = GRATICULE_Y[i];
+        const major = y % 300 === 100;
+        graticule.push(h('line', { key: 'hy' + y, className: major ? 'major' : '', x1: 0, y1: y, x2: 1600, y2: y }));
+        graticule.push(h('text', { key: 'hyt' + y, x: 20, y: y - 4 }, String(60 - i * 5).padStart(2, '0') + '°N'));
+      }
+      graticule.push(h('line', { key: 'axis-x', className: 'axis', x1: 0, y1: 450, x2: 1600, y2: 450 }));
+      graticule.push(h('line', { key: 'axis-y', className: 'axis', x1: 800, y1: 0, x2: 800, y2: 900 }));
+      const nodes = NODES.map(function (node, index) {
+        const count = node.hub ? 18 : 10;
+        const rays = [];
+        for (let ray = 0; ray < count; ray += 1) {
+          const angle = (ray / count) * Math.PI * 2 + index * 0.6;
+          const length = node.hub ? 180 + ((ray * 67 + index * 29) % 260) : 70 + ((ray * 41 + index * 17) % 120);
+          const far = node.hub && ray % 6 === 0;
+          rays.push(
+            h('line', {
+              key: 'ray' + ray,
+              className: (ray % 4 === 0 ? 'bright' : '') + (far ? ' far' : ''),
+              x1: 0,
+              y1: 0,
+              x2: (Math.cos(angle) * length).toFixed(1),
+              y2: (Math.sin(angle) * length).toFixed(1),
+            }),
+          );
+        }
         return h(
           'g',
           {
-            key: node.code,
-            className: 'acb-map-node',
+            key: node.tag,
+            className: 'acb-node' + (node.hub ? ' is-hub' : ''),
             style: { '--acb-i': index },
             transform: 'translate(' + node.x + ' ' + node.y + ')',
           },
-          h('circle', { className: 'acb-node-halo', r: 46, fill: 'url(#acbNodeGlow)' }),
-          h(
-            'g',
-            { className: 'acb-node-rays' },
-            [0, 1, 2, 3, 4, 5].map(function (ray) {
-              const angle = (ray * Math.PI) / 3;
-              return h('line', {
-                key: 'ray-' + ray,
-                x1: Math.cos(angle) * 16,
-                y1: Math.sin(angle) * 16,
-                x2: Math.cos(angle) * 34,
-                y2: Math.sin(angle) * 34,
-              });
-            }),
-          ),
-          h('circle', { className: 'acb-node-ping', r: 20 }),
-          h('circle', { className: 'acb-node-ring', r: 12 }),
-          h('circle', { className: 'acb-node-dot', r: 3.4 }),
-          h('path', { className: 'acb-node-tick', d: 'M 0 -26 L 0 -16 M 0 26 L 0 16 M -26 0 L -16 0 M 26 0 L 16 0' }),
-          h('text', { className: 'acb-node-code', x: 20, y: -6 }, node.code),
-          h('text', { className: 'acb-node-name', x: 20, y: 9 }, node.en),
-          h('text', { className: 'acb-node-zh', x: 20, y: 21 }, node.zh),
+          h('circle', { className: 'acb-node-halo', r: node.hub ? 56 : 32, fill: 'url(#acbNodeGlow)' }),
+          h('g', { className: 'acb-node-rays' }, rays),
+          h('circle', { className: 'acb-node-ring', r: node.hub ? 9 : 5.5 }),
+          h('circle', { className: 'acb-node-dot', r: node.hub ? 3.2 : 2 }),
+          node.hub
+            ? h('text', { className: 'acb-node-tag', x: 14, y: -10 }, node.tag)
+            : null,
+          node.hub && node.name
+            ? h('text', { className: 'acb-node-label', x: 14, y: 2 }, node.name)
+            : null,
         );
       });
-
+      const cities = CITIES.map(function (city) {
+        return h(
+          'g',
+          { key: city.name, className: 'acb-city' },
+          h('circle', { cx: city.x, cy: city.y, r: 1.8 }),
+          h(
+            'text',
+            { x: city.x + 8, y: city.y + 3, textAnchor: city.anchor },
+            city.name,
+          ),
+        );
+      });
       return h(
         'div',
         { className: 'acb-map', 'aria-hidden': true },
         h(
-          'svg',
-          { className: 'acb-map-svg', viewBox: '0 0 1600 900', preserveAspectRatio: 'xMidYMid slice' },
+          'div',
+          { className: 'acb-map-plane' },
           h(
-            'defs',
-            null,
+            'svg',
+            { className: 'acb-map-svg', viewBox: '0 0 1600 900', preserveAspectRatio: 'xMidYMid slice' },
             h(
-              'linearGradient',
-              { id: 'acbSea', x1: '0', y1: '0', x2: '1', y2: '1' },
-              h('stop', { offset: '0%', stopColor: '#041018' }),
-              h('stop', { offset: '55%', stopColor: '#030b12' }),
-              h('stop', { offset: '100%', stopColor: '#01050a' }),
+              'defs',
+              null,
+              h(
+                'radialGradient',
+                { id: 'acbSea', cx: '50%', cy: '46%', r: '72%' },
+                h('stop', { offset: '0%', stopColor: '#061722' }),
+                h('stop', { offset: '58%', stopColor: '#030b14' }),
+                h('stop', { offset: '100%', stopColor: '#010509' }),
+              ),
+              h(
+                'pattern',
+                { id: 'acbTerrainPat', patternUnits: 'userSpaceOnUse', width: 1600, height: 900 },
+                h('image', { href: asset('terrain'), width: 1600, height: 900, preserveAspectRatio: 'xMidYMid slice' }),
+              ),
+              h(
+                'radialGradient',
+                { id: 'acbGlowMagenta' },
+                h('stop', { offset: '0%', stopColor: 'rgba(235,92,158,.55)' }),
+                h('stop', { offset: '55%', stopColor: 'rgba(180,50,120,.22)' }),
+                h('stop', { offset: '100%', stopColor: 'rgba(60,10,40,0)' }),
+              ),
+              h(
+                'radialGradient',
+                { id: 'acbNodeGlow' },
+                h('stop', { offset: '0%', stopColor: 'rgba(226,250,255,.95)' }),
+                h('stop', { offset: '38%', stopColor: 'rgba(150,230,255,.3)' }),
+                h('stop', { offset: '100%', stopColor: 'rgba(30,90,120,0)' }),
+              ),
+              h(
+                'filter',
+                { id: 'acbCoastGlow', x: '-20%', y: '-20%', width: '140%', height: '140%' },
+                h('feGaussianBlur', { stdDeviation: 4.5, result: 'blur' }),
+                h('feMerge', null, h('feMergeNode', { in: 'blur' }), h('feMergeNode', { in: 'SourceGraphic' })),
+              ),
+              h(
+                'filter',
+                { id: 'acbSoftGlow', x: '-30%', y: '-30%', width: '160%', height: '160%' },
+                h('feGaussianBlur', { stdDeviation: 8, result: 'blur' }),
+                h('feMerge', null, h('feMergeNode', { in: 'blur' }), h('feMergeNode', { in: 'SourceGraphic' })),
+              ),
+              clipDefs,
             ),
+            h('rect', { width: 1600, height: 900, fill: 'url(#acbSea)' }),
+            h('g', { className: 'acb-graticule' }, graticule),
+            h('g', { className: 'acb-lands' }, lands),
             h(
-              'radialGradient',
-              { id: 'acbLandShade', cx: '50%', cy: '46%', r: '70%' },
-              h('stop', { offset: '0%', stopColor: 'rgba(2,10,14,.1)' }),
-              h('stop', { offset: '62%', stopColor: 'rgba(2,8,12,.45)' }),
-              h('stop', { offset: '100%', stopColor: 'rgba(1,5,8,.92)' }),
+              'g',
+              { clipPath: 'url(#acbClip-main)' },
+              h('path', { d: LANDS[0].d, fill: 'url(#acbTerrainPat)', className: 'acb-land-tex' }),
             ),
-            h(
-              'radialGradient',
-              { id: 'acbGlowTea' },
-              h('stop', { offset: '0%', stopColor: 'rgba(96,226,244,.55)' }),
-              h('stop', { offset: '52%', stopColor: 'rgba(40,150,178,.22)' }),
-              h('stop', { offset: '100%', stopColor: 'rgba(8,40,52,0)' }),
-            ),
-            h(
-              'radialGradient',
-              { id: 'acbGlowBright' },
-              h('stop', { offset: '0%', stopColor: 'rgba(136,244,255,.62)' }),
-              h('stop', { offset: '52%', stopColor: 'rgba(56,188,216,.24)' }),
-              h('stop', { offset: '100%', stopColor: 'rgba(8,44,58,0)' }),
-            ),
-            h(
-              'radialGradient',
-              { id: 'acbGlowMagenta' },
-              h('stop', { offset: '0%', stopColor: 'rgba(238,96,156,.56)' }),
-              h('stop', { offset: '56%', stopColor: 'rgba(186,52,112,.2)' }),
-              h('stop', { offset: '100%', stopColor: 'rgba(52,8,28,0)' }),
-            ),
-            h(
-              'radialGradient',
-              { id: 'acbNodeGlow' },
-              h('stop', { offset: '0%', stopColor: 'rgba(255,206,140,.9)' }),
-              h('stop', { offset: '42%', stopColor: 'rgba(255,160,70,.28)' }),
-              h('stop', { offset: '100%', stopColor: 'rgba(60,30,8,0)' }),
-            ),
-            h(
-              'pattern',
-              { id: 'acbTerrainPat', patternUnits: 'userSpaceOnUse', width: 1600, height: 900 },
-              h('image', { href: asset('terrain'), width: 1600, height: 900, preserveAspectRatio: 'xMidYMid slice' }),
-            ),
-            h(
-              'pattern',
-              { id: 'acbGrid', patternUnits: 'userSpaceOnUse', width: 80, height: 80 },
-              h('path', { d: 'M 80 0 L 0 0 0 80', fill: 'none', stroke: 'rgba(127,233,255,.045)', strokeWidth: 1 }),
-            ),
-            h('clipPath', { id: 'acbLandClip' }, h('path', { d: CONTINENT })),
-            h(
-              'filter',
-              { id: 'acbCoastGlow', x: '-20%', y: '-20%', width: '140%', height: '140%' },
-              h('feGaussianBlur', { stdDeviation: 5, result: 'blur' }),
-              h('feMerge', null, h('feMergeNode', { in: 'blur' }), h('feMergeNode', { in: 'SourceGraphic' })),
-            ),
-            h(
-              'filter',
-              { id: 'acbSoftGlow', x: '-30%', y: '-30%', width: '160%', height: '160%' },
-              h('feGaussianBlur', { stdDeviation: 8, result: 'blur' }),
-              h('feMerge', null, h('feMergeNode', { in: 'blur' }), h('feMergeNode', { in: 'SourceGraphic' })),
-            ),
-            h(
-              'filter',
-              { id: 'acbRegionBlur', x: '-10%', y: '-10%', width: '120%', height: '120%' },
-              h('feGaussianBlur', { stdDeviation: 18 }),
-            ),
-          ),
-          h('rect', { width: 1600, height: 900, fill: 'url(#acbSea)' }),
-          h('rect', { width: 1600, height: 900, fill: 'url(#acbGrid)' }),
-          h('ellipse', { cx: 800, cy: 470, rx: 660, ry: 400, fill: 'rgba(18,66,86,.16)', filter: 'url(#acbSoftGlow)' }),
-          h('path', { d: CONTINENT, fill: 'url(#acbTerrainPat)', opacity: 0.74 }),
-          h(
-            'g',
-            { clipPath: 'url(#acbLandClip)' },
-            h('g', { filter: 'url(#acbRegionBlur)' }, regions.map(function (region) { return region; })),
-            h('path', {
-              key: 'primary-sector',
-              d: PRIMARY_SECTOR,
-              fill: 'rgba(190,60,120,.17)',
-              stroke: 'rgba(230,90,150,.34)',
-              strokeWidth: 1,
-              strokeDasharray: '7 6',
-            }),
-          ),
-          h('path', { d: CONTINENT, fill: 'url(#acbLandShade)', opacity: 0.55 }),
-          h(
-            'g',
-            { className: 'acb-region-glows', clipPath: 'url(#acbLandClip)' },
-            REGION_GLOWS.map(function (glow, index) {
-              return h('ellipse', {
-                key: 'region-glow-' + index,
-                className: 'acb-region-glow',
-                cx: glow.cx,
-                cy: glow.cy,
-                rx: glow.rx,
-                ry: glow.ry,
-                fill: 'url(#acbGlow' + (glow.tone === 'bright' ? 'Bright' : 'Tea') + ')',
-                style: { '--acb-i': index },
-              });
-            }),
-            h('ellipse', {
-              key: 'region-glow-primary',
-              className: 'acb-region-glow acb-region-glow-primary',
-              cx: 760,
-              cy: 460,
-              rx: 240,
-              ry: 190,
-              fill: 'url(#acbGlowMagenta)',
-            }),
-          ),
-          h('path', {
-            d: CONTINENT,
-            fill: 'none',
-            stroke: 'rgba(127,233,255,.55)',
-            strokeWidth: 5,
-            opacity: 0.3,
-            filter: 'url(#acbSoftGlow)',
-          }),
-          h('path', {
-            d: CONTINENT,
-            fill: 'none',
-            stroke: 'rgba(168,245,255,.92)',
-            strokeWidth: 1.4,
-            filter: 'url(#acbCoastGlow)',
-          }),
-          route,
-          h('g', { className: 'acb-map-nodes' }, nodeGroups),
-          h(
-            'g',
-            { className: 'acb-map-ticks' },
-            h('path', { d: 'M 80 0 L 80 18 M 0 80 L 18 80 M 1520 0 L 1520 18 M 1600 80 L 1582 80', stroke: 'rgba(127,233,255,.3)' }),
-            h('path', { d: 'M 80 900 L 80 882 M 0 820 L 18 820 M 1520 900 L 1520 882 M 1600 820 L 1582 820', stroke: 'rgba(127,233,255,.3)' }),
-            h('text', { x: 96, y: 26 }, 'GRID 06 // LOCAL THEATER'),
-            h('text', { x: 96, y: 886 }, 'SCALE 1:250 000'),
-            h('text', { x: 1600 - 96, y: 26, textAnchor: 'end' }, 'OPERATION // FIRST LIGHT'),
-            h('text', { x: 1600 - 96, y: 886, textAnchor: 'end' }, 'SEC ' + String(40 + Math.round(hash * 9)).padStart(2, '0')),
+            h('g', { className: 'acb-highlights' }, highlights),
+            h('g', { className: 'acb-nodes' }, nodes),
+            h('g', { className: 'acb-cities' }, cities),
           ),
         ),
       );
     }
-
     const HOLO = h('div', {
       className: 'acb-holo',
       style: { backgroundImage: 'url("' + asset('holo') + '")' },
@@ -616,54 +649,52 @@ window.__ModuleLoader__.load({
         Scene,
         { id: 'theater', active, past },
         h(
-          'aside',
-          { className: 'acb-intel' },
-          h('div', { className: 'acb-panel-head' }, t('intel.header'), h('i', null)),
-          h(
-            'dl',
-            { className: 'acb-intel-list' },
-            [
-              ['intel.tgt', 'intel.tgt.value'],
-              ['intel.mission', 'intel.mission.value'],
-              ['intel.op', 'intel.op.value'],
-              ['intel.status', 'intel.status.value'],
-            ].map(function (pair, index) {
-              return h(
-                'div',
-                { key: pair[0], style: { '--acb-i': index } },
-                h('dt', null, t(pair[0])),
-                h('dd', null, t(pair[1])),
-              );
-            }),
-          ),
-          h('div', { className: 'acb-intel-note' }, t('theater.kicker')),
-        ),
-        h(
-          'aside',
-          { className: 'acb-data' },
-          h('div', { className: 'acb-panel-head' }, t('data.header'), h('i', null)),
+          'div',
+          { className: 'acb-rails acb-rails-left', 'aria-hidden': true },
+          h('div', { className: 'acb-rail-mark' }, h('i', null), 'DSH // LOCAL COMMAND'),
+          h('div', { className: 'acb-rail-head' }, 'SAT DATA LINK'),
+          h('div', { className: 'acb-rail-sub' }, 'UPLOAD STATUS // 06'),
           h(
             'ul',
-            { className: 'acb-data-list' },
-            NODES.slice(0, 5).map(function (node, index) {
-              return h(
-                'li',
-                { key: node.code, style: { '--acb-i': index } },
-                h('span', { className: 'acb-check' }, '✓'),
-                h('b', null, node.code),
-                h('span', null, node.en),
-              );
+            { className: 'acb-rail-list' },
+            SAT_ROWS.map(function (row, index) {
+              return h('li', { key: 'sat-' + index, style: { '--acb-i': index } }, row);
             }),
           ),
-          h('div', { className: 'acb-data-bar' }, h('i', null)),
+          h('div', { className: 'acb-rail-head acb-rail-head-gap' }, 'NODE STATUS'),
+          h(
+            'ul',
+            { className: 'acb-rail-list' },
+            NODE_ROWS.map(function (row, index) {
+              return h('li', { key: 'node-row-' + index, style: { '--acb-i': index } }, row);
+            }),
+          ),
         ),
         h(
           'div',
-          { className: 'acb-legend', 'aria-hidden': true },
-          h('span', null, h('i', { className: 'dot dot-a' }), t('legend.active')),
-          h('span', null, h('i', { className: 'dot dot-b' }), t('legend.route')),
-          h('span', null, h('i', { className: 'dot dot-c' }), t('legend.grid')),
-          h('span', { className: 'acb-legend-right' }, 'LIVE // BRIEFING'),
+          { className: 'acb-rails acb-rails-right', 'aria-hidden': true },
+          h('div', { className: 'acb-rail-head' }, 'PLATE 06 // LOCAL'),
+          h(
+            'ul',
+            { className: 'acb-rail-list' },
+            PLATE_ROWS.map(function (row, index) {
+              return h('li', { key: 'plate-' + index, style: { '--acb-i': index } }, row);
+            }),
+          ),
+          h('div', { className: 'acb-rail-head acb-rail-head-gap' }, 'THEATER GRID'),
+          h(
+            'ul',
+            { className: 'acb-rail-list' },
+            GRID_ROWS.map(function (row, index) {
+              return h('li', { key: 'grid-' + index, style: { '--acb-i': index } }, row);
+            }),
+          ),
+        ),
+        h(
+          'div',
+          { className: 'acb-caption' },
+          h('p', { className: 'acb-caption-en' }, t('theater.caption')),
+          h('p', { className: 'acb-caption-zh' }, t('theater.caption.zh')),
         ),
       );
     }
@@ -720,10 +751,10 @@ window.__ModuleLoader__.load({
             NODES.slice(0, 5).map(function (node, index) {
               return h(
                 'li',
-                { key: node.code, style: { '--acb-i': index } },
+                { key: node.tag, style: { '--acb-i': index } },
                 h('span', { className: 'acb-check' }, '✓'),
-                h('span', null, node.code + ' // ' + node.en),
-                h('em', null, node.zh),
+                h('span', null, node.tag + ' // ' + node.name),
+                h('em', null, 'READY'),
               );
             }),
           ),
@@ -1140,47 +1171,67 @@ window.__ModuleLoader__.load({
 .acb-root[data-phase="console"] .acb-holo{opacity:.28;filter:saturate(.8);}
 .acb-root[data-phase="title"] .acb-holo{opacity:.2;filter:blur(1px);}
 .acb-map{position:absolute;inset:0;z-index:1;pointer-events:none;
-  transition:opacity .9s ease,filter .9s ease,transform 1.2s ease;transform-origin:56% 50%;}
+  transition:opacity .9s ease,filter .9s ease;}
+.acb-map-plane{position:absolute;inset:-9% -6%;transform-origin:50% 46%;
+  transition:transform 1.6s cubic-bezier(.2,.6,.2,1);
+  transform:perspective(1700px) rotateX(7deg) scale(1.04);}
 .acb-map-svg{width:100%;height:100%;display:block;}
-.acb-root[data-phase="brief"] .acb-map{opacity:.36;filter:blur(1.2px) saturate(.9);transform:scale(1.14);}
-.acb-root[data-phase="theater"] .acb-map{opacity:1;filter:none;transform:scale(1.02);}
-.acb-root[data-phase="console"] .acb-map{opacity:.34;filter:blur(1px);transform:scale(1.08);}
-.acb-root[data-phase="title"] .acb-map{opacity:.26;filter:blur(1.6px);transform:scale(1.12);}
-.acb-map-route{opacity:.9;}
-.acb-route-dash{animation:acbDash 6s linear infinite;}
-@keyframes acbDash{to{stroke-dashoffset:-96}}
-.acb-region-glow{transform-box:fill-box;transform-origin:center;mix-blend-mode:screen;
-  animation:acbRegionBreathe 7.5s ease-in-out infinite alternate;
-  animation-delay:calc(var(--acb-i,0) * -1.7s);}
-@keyframes acbRegionBreathe{from{opacity:.5;transform:scale(.93)}to{opacity:1;transform:scale(1.07)}}
-.acb-region-glow-primary{animation-duration:5.4s;animation-delay:-1.2s;}
-.acb-node-halo{transform-box:fill-box;transform-origin:center;mix-blend-mode:screen;
-  animation:acbNodeHalo 3.6s ease-in-out infinite;
-  animation-delay:calc(var(--acb-i,0) * .28s);}
-@keyframes acbNodeHalo{0%,100%{opacity:.26;transform:scale(.86)}50%{opacity:.78;transform:scale(1.16)}}
-.acb-node-rays{transform-box:fill-box;transform-origin:center;opacity:.6;
-  animation:acbSpin 28s linear infinite;}
-.acb-node-rays line{stroke:rgba(255,196,120,.42);stroke-width:1;}
-.acb-map-node{opacity:.35;transition:opacity .6s ease;}
-.acb-map-node .acb-node-ping{fill:none;stroke:rgba(127,233,255,.5);stroke-width:1;
-  transform-box:fill-box;transform-origin:center;animation:acbPing 3s ease-out infinite;
-  animation-delay:calc(var(--acb-i) * .18s);}
-.acb-map-node .acb-node-ring{fill:rgba(2,10,14,.55);stroke:rgba(255,171,74,.8);stroke-width:1.1;}
-.acb-map-node .acb-node-dot{fill:var(--acb-amber);filter:drop-shadow(0 0 6px rgba(255,171,74,.9));}
-.acb-map-node .acb-node-tick{stroke:rgba(127,233,255,.5);stroke-width:1;}
-.acb-node-code{fill:rgba(255,196,120,.8);font-size:9px;letter-spacing:.18em;}
-.acb-node-name{fill:rgba(216,246,255,.82);font-size:10px;letter-spacing:.16em;}
-.acb-node-zh{fill:rgba(160,208,222,.5);font-size:9px;letter-spacing:.06em;}
-.acb-root[data-phase="theater"] .acb-map-node{opacity:.72;}
-.acb-root[data-phase="theater"] .acb-map-node:first-child{animation:acbNodeIn .5s ease forwards;}
-.acb-root[data-phase="theater"] .acb-map-node:nth-child(2){animation:acbNodeIn .5s ease .18s forwards;}
-.acb-root[data-phase="theater"] .acb-map-node:nth-child(3){animation:acbNodeIn .5s ease .36s forwards;}
-.acb-root[data-phase="theater"] .acb-map-node:nth-child(4){animation:acbNodeIn .5s ease .54s forwards;}
-.acb-root[data-phase="theater"] .acb-map-node:nth-child(5){animation:acbNodeIn .5s ease .72s forwards;}
-.acb-root[data-phase="theater"] .acb-map-node:nth-child(6){animation:acbNodeIn .5s ease .9s forwards;}
-@keyframes acbNodeIn{from{opacity:.2}to{opacity:1}}
-@keyframes acbPing{0%{transform:scale(.5);opacity:.7}70%{transform:scale(1.6);opacity:0}100%{transform:scale(1.6);opacity:0}}
-.acb-map-ticks text{fill:rgba(127,233,255,.4);font-size:9px;letter-spacing:.22em;}
+.acb-root[data-phase="brief"] .acb-map{opacity:.34;filter:blur(1.2px) saturate(.95);}
+.acb-root[data-phase="brief"] .acb-map-plane{transform:perspective(1700px) rotateX(17deg) scale(1.24);}
+.acb-root[data-phase="theater"] .acb-map{opacity:1;filter:none;}
+.acb-root[data-phase="theater"] .acb-map-plane{transform:perspective(1700px) rotateX(5deg) scale(1.03);}
+.acb-root[data-phase="console"] .acb-map{opacity:.32;filter:blur(1px);}
+.acb-root[data-phase="console"] .acb-map-plane{transform:perspective(1700px) rotateX(10deg) scale(1.1);}
+.acb-root[data-phase="title"] .acb-map{opacity:.26;filter:blur(1.6px);}
+.acb-root[data-phase="title"] .acb-map-plane{transform:perspective(1700px) rotateX(12deg) scale(1.14);}
+.acb-graticule line{stroke:rgba(96,190,255,.09);stroke-width:1;}
+.acb-graticule line.major{stroke:rgba(96,200,255,.16);}
+.acb-graticule line.axis{stroke:rgba(140,230,255,.22);stroke-dasharray:7 7;}
+.acb-graticule text{fill:rgba(150,215,245,.38);font-size:7.5px;letter-spacing:.16em;}
+.acb-land{fill:rgba(5,16,27,.74);stroke:rgba(184,246,255,.9);stroke-width:1.05;}
+.acb-land-halo{fill:none;stroke:rgba(88,208,255,.32);stroke-width:5;filter:url(#acbSoftGlow);}
+.acb-land-tex{opacity:.14;filter:hue-rotate(150deg) saturate(.55) brightness(.8);}
+.acb-highlight{fill:rgba(200,60,130,.19);stroke:rgba(255,120,180,.58);stroke-width:1;stroke-dasharray:5 5;}
+.acb-highlight-glow{fill:url(#acbGlowMagenta);mix-blend-mode:screen;opacity:.68;}
+.acb-highlight-label{fill:rgba(255,170,205,.9);font-size:10px;letter-spacing:.24em;text-transform:uppercase;}
+.acb-city circle{fill:rgba(220,250,255,.9);}
+.acb-city text{fill:rgba(196,238,255,.62);font-size:8px;letter-spacing:.14em;}
+.acb-node{opacity:.9;}
+.acb-node-rays{transform-box:fill-box;transform-origin:center;animation:acbSpin 60s linear infinite;}
+.acb-node-rays line{stroke:rgba(170,235,255,.26);stroke-width:1;}
+.acb-node-rays line.bright{stroke:rgba(220,250,255,.55);}
+.acb-node-rays line.far{stroke:rgba(214,248,255,.34);stroke-width:.8;}
+.acb-node-ring{fill:rgba(4,14,22,.5);stroke:rgba(190,246,255,.6);stroke-width:1;}
+.acb-node-dot{fill:#e8fdff;filter:drop-shadow(0 0 6px rgba(190,246,255,.95));}
+.acb-node-halo{mix-blend-mode:screen;opacity:.85;}
+.acb-node-label{fill:rgba(214,246,255,.85);font-size:8.5px;letter-spacing:.16em;}
+.acb-node-tag{fill:rgba(255,190,130,.68);font-size:7px;letter-spacing:.14em;}
+.acb-rails{position:absolute;top:15vh;z-index:4;width:200px;font-size:7.5px;line-height:1.75;
+  letter-spacing:.1em;color:rgba(176,230,250,.62);pointer-events:none;text-shadow:0 0 8px rgba(0,0,0,.9);line-height:1.9;}
+.acb-rails-left{left:24px;text-align:left;border-left:1px solid rgba(96,200,255,.24);padding-left:14px;}
+.acb-rails::before{content:"";position:absolute;top:-22px;bottom:-22px;left:-28px;right:-26px;z-index:-1;pointer-events:none;
+  background:linear-gradient(90deg,rgba(1,6,10,.92),rgba(1,6,10,.6) 62%,rgba(1,6,10,0));backdrop-filter:blur(2px);}
+.acb-rails-right::before{left:-26px;right:-28px;
+  background:linear-gradient(270deg,rgba(1,6,10,.92),rgba(1,6,10,.6) 62%,rgba(1,6,10,0));backdrop-filter:blur(2px);}
+.acb-rails-right{right:24px;text-align:right;border-right:1px solid rgba(96,200,255,.22);padding-right:14px;}
+.acb-rail-mark{display:flex;align-items:center;gap:8px;font-size:8px;letter-spacing:.26em;
+  color:rgba(220,248,255,.7);margin-bottom:16px;}
+.acb-rail-mark i{width:9px;height:9px;border:1px solid rgba(255,171,74,.8);transform:rotate(45deg);display:inline-block;}
+.acb-rail-head{display:flex;align-items:center;gap:8px;font-size:8px;letter-spacing:.26em;
+  color:rgba(210,244,255,.8);text-transform:uppercase;margin-top:6px;}
+.acb-rail-head::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,rgba(96,200,255,.4),transparent);}
+.acb-rails-right .acb-rail-head::after{background:linear-gradient(270deg,rgba(96,200,255,.4),transparent);}
+.acb-rail-sub{font-size:6.5px;color:rgba(150,210,235,.36);letter-spacing:.2em;margin-top:2px;}
+.acb-rail-head-gap{margin-top:18px;}
+.acb-rail-list{list-style:none;margin:6px 0 0;padding:0;}
+.acb-rail-list li{opacity:0;animation:acbRailIn .5s ease forwards;animation-delay:calc(.2s + var(--acb-i) * .06s);white-space:pre;}
+.acb-rails-right .acb-rail-list li{text-align:right;}
+@keyframes acbRailIn{to{opacity:1}}
+.acb-caption{position:absolute;left:50%;bottom:calc(6.5vh + 54px);transform:translateX(-50%);z-index:4;
+  width:min(920px,82vw);text-align:center;pointer-events:none;text-shadow:0 2px 14px rgba(0,0,0,.9);}
+.acb-caption-en{margin:0;font-family:"Segoe UI",system-ui,sans-serif;font-size:clamp(13px,1.15vw,17px);
+  letter-spacing:.04em;color:#eef9ff;font-weight:400;}
+.acb-caption-zh{margin:6px 0 0;font-size:10px;letter-spacing:.16em;color:rgba(190,230,245,.5);}
 .acb-shade{position:absolute;inset:0;z-index:2;pointer-events:none;
   background:linear-gradient(180deg,rgba(2,6,9,.5),transparent 26%,transparent 70%,rgba(2,6,9,.62));}
 .acb-scan{position:absolute;inset:0;z-index:7;pointer-events:none;opacity:.45;
@@ -1347,7 +1398,7 @@ window.__ModuleLoader__.load({
 @keyframes acbBlip{0%,100%{opacity:.2}50%{opacity:1}}
 .acb-radar span{position:absolute;left:50%;bottom:-20px;transform:translateX(-50%);font-size:8px;
   letter-spacing:.26em;color:rgba(127,233,255,.5);white-space:nowrap;}
-.acb-telemetry{display:flex;justify-content:flex-end;gap:18px;margin-top:18px;font-size:9px;letter-spacing:.2em;color:rgba(127,233,255,.5);}
+.acb-telemetry{display:flex;justify-content:flex-end;gap:18px;margin-top:28px;font-size:9px;letter-spacing:.2em;color:rgba(127,233,255,.5);}
 .acb-title-wrap{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:3;
   width:min(1000px,90vw);text-align:center;}
 .acb-ghost{position:absolute;left:50%;top:50%;transform:translate(-50%,-56%);

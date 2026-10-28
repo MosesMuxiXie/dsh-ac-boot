@@ -1,14 +1,14 @@
 # 战术简报开机序列 · DSH Tactical Briefing Boot
 
-DeepSeek Harness Web UI 的电影感开机序列：四段式**战术任务简报**开场——全息指挥桌上行、全幅战区态势图、操作员权限与系统检查、任务开始大标题。
+DeepSeek Harness Web UI 的电影感开机序列：四段式**战术任务简报**开场——全息指挥桌上行、全域全息战区图、操作员权限与系统检查、任务开始大标题。
 
-这一版刻意回避写实空战照片：**没有战机、甲板、云海日落**。画面主体是任务简报界面本身——虚构战区地图、航线与航点、分区光晕、雷达、情报面板、分类印章与 HUD 文字；地图、线稿和 HUD 全部由代码绘制，Agnes 只负责两张抽象底材（地形浮雕 + 全息指挥桌）。默认约 15 秒，四段自动衔接，结束淡入工作区。
+这一版把"任务简报界面"本身做成主角：黑底全息战区地图、经纬网格、左右两列卫星数据链 / 图版数据、多节点长射线爆发、品红高亮战区、城市标签与底部任务字幕。地图、网格、数据、HUD 全部由代码绘制，Agnes 只负责两张抽象底材（地形浮雕 + 全息指挥桌）；没有战机、甲板或云海日落照片。默认约 15 秒，四段自动衔接，结束淡入工作区。
 
 序列只属于**一次应用启动**：冷启动播放一次；休眠唤醒、托盘恢复、页面刷新都不会重播。
 
-当前版本：**0.14.1**
+当前版本：**0.15.0**
 
-> 0.14.1：把分区与航点的呼吸光晕重新加回来——每个分区一颗缓慢呼吸的径向光晕，品红主区一颗更强的光晕，航点带琥珀光晕与旋转射线。
+> 0.15.0：战区段重做成完整的任务简报界面——程序化海岸线 + 经纬网格 + `SAT DATA LINK` / `PLATE` 数据栏 + 多节点长射线 + 品红 `LOCAL THEATER` 高亮 + 底部任务字幕。
 
 | 简报上行 | 战区态势 |
 | --- | --- |
@@ -19,11 +19,11 @@ DeepSeek Harness Web UI 的电影感开机序列：四段式**战术任务简报
 ## 这一版是什么
 
 1. **简报 / BRIEF（0–2.8s）**：暗场里一张全息指挥桌缓慢呼吸，左侧轨道环，右侧 `DEEPSEEK / HARNESS` 字标划开；`OPERATION // FIRST LIGHT`、加密上行状态、简报准备进度，右侧 `BRIEFING DATA`（TGT / GRID / UPLINK / STATUS）。
-2. **战区 / THEATER（2.8–7.2s）**：全幅虚构战区地图。Agnes 地形浮雕裁进原创大陆轮廓，青色发光海岸线；四个分区各带缓慢呼吸的径向光晕，品红主区一颗更强的品红光晕；六个航点 `TGT-01…TGT-06`（PROFILE / SERVICES / WORKSPACE / SESSION / DISPLAY / LINK）带琥珀光晕与旋转射线，沿琥珀航线依次点亮；左侧 `TGT INFO`，右侧 `BRIEFING DATA`，底部图例与网格刻度。
-3. **权限 / CONSOLE（7.2–10.8s）**：地图退暗，左侧 `OPERATOR ACCESS` 卡片逐条校验身份、凭据、本机配置并盖 `ACCESS GRANTED`；右侧系统检查列表、雷达扫描与遥测；背景是低透明度的 `CLASSIFIED` 分类水印。
+2. **战区 / THEATER（2.8–7.2s）**：全幅全息战区图。程序化海岸线 + 青色发光描边，经纬网格与坐标刻度；左右两列数据栏——`SAT DATA LINK / UPLOAD STATUS / NODE STATUS` 与 `PLATE 06 // LOCAL / THEATER GRID`；12 个数据节点带长短不一的射线爆发，4 个主节点更亮；品红 `LOCAL THEATER` 高亮区、城市标签与底部双语任务字幕。
+3. **权限 / CONSOLE（7.2–10.8s）**：战区图退暗，左侧 `OPERATOR ACCESS` 卡片逐条校验身份、凭据、本机配置并盖 `ACCESS GRANTED`；右侧系统检查列表、雷达扫描与遥测；背景是低透明度的 `CLASSIFIED` 分类水印。
 4. **标题 / TITLE（10.8–15s）**：地图线稿淡出，`DEEPSEEK` 大标题、`MISSION START` 任务开始章、三枚状态 chip、`按 Enter 继续` 与自动继续进度。
 
-地图是原创虚构战区，不读取真实工作区数据，也不映射现实地理。
+构图与信息密度参考空战任务简报界面（黑底全息地图、数据链侧栏、节点射线、底部字幕），但**地图形状、城市、数据与文案全部原创虚构**，不映射现实地理，也不读取真实工作区数据。
 
 ## 画面资产（Agnes）
 
@@ -172,8 +172,9 @@ ln -s "$HOME/src/dsh-ac-boot" "$profileRoot/node_modules/@local/dsh-ac-boot"
 - 覆盖层级：`ORDER`（默认 `9000`）
 - 背景图版本：`ART_VERSION`（默认 `14`，换图时 +1）
 - 启动去重标记：`sessionStorage['acb-boot-played']`（清掉它可让下一次页面重载重新播放）
-- 战区形状：`CONTINENT`；分区：`REGIONS` / `PRIMARY_SECTOR`；航点：`NODES`；航线：`ROUTE`
-- 区域光晕：`REGION_GLOWS` 与 `.acb-region-glow`（呼吸 7.5s，主区 5.4s）；航点光晕 `acbNodeGlow` 与 `.acb-node-halo`、旋转射线 `.acb-node-rays`
+- 战区形状：`LANDS`（`blobPath()` 程序化海岸线，种子固定）；高亮区：`HIGHLIGHTS`；节点：`NODES`；城市：`CITIES`；经纬网格：`GRATICULE_X` / `GRATICULE_Y`
+- 数据栏文案：`SAT_ROWS` / `NODE_ROWS` / `PLATE_ROWS` / `GRID_ROWS`；底部字幕：`theater.caption` / `theater.caption.zh`
+- 地图倾角：`.acb-map-plane` 的四段 `rotateX`（简报 17° → 战区 5° → 权限 10° → 标题 12°）
 
 ## 交互
 
