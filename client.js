@@ -78,7 +78,7 @@ window.__ModuleLoader__.load({
       'aria.skip': '跳过开机动画',
       'skip.label': '跳过',
       'hud.op': '行动 // 第一缕光',
-      'hud.build': '版本 18.0 // 本地',
+      'hud.build': '版本 19.0 // 本地',
       'hud.theater': '本地战区 // 06',
       'hud.link': '链路安全',
       'brief.kicker': '战术简报 // 本地战区',
@@ -127,7 +127,7 @@ window.__ModuleLoader__.load({
       'aria.skip': 'Skip the boot sequence',
       'skip.label': 'SKIP',
       'hud.op': 'OPERATION // FIRST LIGHT',
-      'hud.build': 'BUILD 18.0 // LOCAL',
+      'hud.build': 'BUILD 19.0 // LOCAL',
       'hud.theater': 'LOCAL THEATER // 06',
       'hud.link': 'LINK SECURE',
       'brief.kicker': 'TACTICAL BRIEFING // LOCAL THEATER',
@@ -490,12 +490,23 @@ window.__ModuleLoader__.load({
         { className: 'acb-seed-anchor', transform: 'translate(762 392)' },
         h(
           'g',
+          { className: 'acb-seed-dome-wrap' },
+          h('circle', { className: 'acb-seed-dome', r: 240, fill: 'url(#acbDomeFill)' }),
+          h('circle', { className: 'acb-seed-dome-rim', r: 240 }),
+          h('circle', { className: 'acb-seed-dome-inner', r: 172 }),
+        ),
+        h(
+          'g',
           { className: 'acb-seed' },
           h('circle', { className: 'acb-seed-halo acb-seed-halo-far', r: 176, fill: 'url(#acbSeedGlow)' }),
           h('circle', { className: 'acb-seed-halo acb-seed-halo-mid', r: 82, fill: 'url(#acbSeedGlow)' }),
           h('circle', { className: 'acb-seed-halo acb-seed-halo-near', r: 38, fill: 'url(#acbSeedCore)' }),
           h('circle', { className: 'acb-seed-ring', r: 18 }),
           h('g', { className: 'acb-seed-rays' }, seedRays),
+        ),
+        h(
+          'g',
+          { className: 'acb-seed-coregroup' },
           h('circle', { className: 'acb-seed-flare', r: 24, fill: 'url(#acbSeedCore)' }),
           h('circle', { className: 'acb-seed-core', r: 9 }),
           h('circle', { className: 'acb-seed-core-inner', r: 4 }),
@@ -573,6 +584,15 @@ window.__ModuleLoader__.load({
                 h('stop', { offset: '44%', stopColor: 'rgba(224,251,255,.72)' }),
                 h('stop', { offset: '72%', stopColor: 'rgba(150,225,255,.22)' }),
                 h('stop', { offset: '100%', stopColor: 'rgba(120,220,255,0)' }),
+              ),
+              h(
+                'radialGradient',
+                { id: 'acbDomeFill', cx: '50%', cy: '46%', r: '52%' },
+                h('stop', { offset: '0%', stopColor: 'rgba(200,242,255,.05)' }),
+                h('stop', { offset: '58%', stopColor: 'rgba(170,228,255,.11)' }),
+                h('stop', { offset: '86%', stopColor: 'rgba(200,242,255,.19)' }),
+                h('stop', { offset: '96%', stopColor: 'rgba(240,253,255,.38)' }),
+                h('stop', { offset: '100%', stopColor: 'rgba(255,255,255,0)' }),
               ),
               h(
                 'clipPath',
@@ -1314,9 +1334,9 @@ window.__ModuleLoader__.load({
 .acb-root[data-phase="theater"] .acb-node .acb-node-dot{animation:acbNodeCoreIn .55s ease calc(1.85s + var(--acb-i) * .08s) both;}
 @keyframes acbNodeCoreIn{from{opacity:0;transform:scale(.3)}to{opacity:1;transform:scale(1)}}
 .acb-root[data-phase="theater"] .acb-node .acb-node-halo,
-.acb-root[data-phase="theater"] .acb-node .acb-node-halo-core{animation:acbNodeHaloIn 2.2s ease calc(1.7s + var(--acb-i) * .05s) both;}
+.acb-root[data-phase="theater"] .acb-node .acb-node-halo-core{animation:acbNodeHaloIn 2.2s ease calc(1.62s + var(--acb-i) * .09s) both;}
 @keyframes acbNodeHaloIn{0%{opacity:0;transform:scale(.4)}22%{opacity:.95;transform:scale(1.1)}55%{opacity:.7;transform:scale(1)}100%{opacity:0;transform:scale(1.15)}}
-.acb-root[data-phase="theater"] .acb-node .acb-node-rays{animation:acbNodeRaysOut 1.7s ease calc(1.72s + var(--acb-i) * .05s) both;}
+.acb-root[data-phase="theater"] .acb-node .acb-node-rays{animation:acbNodeRaysOut 1.7s ease calc(1.68s + var(--acb-i) * .09s) both;}
 @keyframes acbNodeRaysOut{0%{opacity:0;transform:scale(.05)}16%{opacity:1;transform:scale(1)}42%{opacity:.95;transform:scale(1.01)}100%{opacity:0;transform:scale(1.08)}}
 .acb-root[data-phase="theater"] .acb-node.is-hub .acb-node-halo{animation-name:acbNodeHaloHub;}
 @keyframes acbNodeHaloHub{0%{opacity:0;transform:scale(.4)}20%{opacity:1;transform:scale(1.12)}55%{opacity:.85;transform:scale(1)}100%{opacity:.5;transform:scale(1.05)}}
@@ -1325,6 +1345,23 @@ window.__ModuleLoader__.load({
 .acb-root[data-phase="theater"] .acb-node-label,
 .acb-root[data-phase="theater"] .acb-node-tag{animation:acbLabelIn .8s ease calc(2.6s + var(--acb-i) * .05s) both;}
 .acb-seed-anchor{pointer-events:none;}
+.acb-seed-dome-wrap{opacity:0;transform-box:fill-box;transform-origin:center;}
+.acb-root[data-phase="theater"] .acb-seed-dome-wrap{animation:acbDomeGrow 3.4s cubic-bezier(.2,.6,.2,1) 1.05s both;}
+@keyframes acbDomeGrow{
+  0%{opacity:0;transform:scale(.07)}
+  9%{opacity:.9;transform:scale(.2)}
+  38%{opacity:.85;transform:scale(.78)}
+  62%{opacity:.7;transform:scale(1.16)}
+  82%{opacity:.35;transform:scale(1.5)}
+  100%{opacity:0;transform:scale(1.72)}
+}
+.acb-seed-dome{fill:url(#acbDomeFill);}
+.acb-seed-dome-rim{fill:none;stroke:rgba(228,252,255,.42);stroke-width:1.3;filter:drop-shadow(0 0 12px rgba(170,240,255,.6));}
+.acb-seed-dome-inner{fill:none;stroke:rgba(180,236,255,.22);stroke-width:.8;stroke-dasharray:3 7;
+  transform-box:fill-box;transform-origin:center;animation:acbSpin 60s linear infinite;}
+.acb-seed-coregroup{opacity:0;}
+.acb-root[data-phase="theater"] .acb-seed-coregroup{animation:acbSeedCoreFade 3.5s linear .95s both;}
+@keyframes acbSeedCoreFade{0%{opacity:0}6%{opacity:1}72%{opacity:1}88%{opacity:.9}100%{opacity:0}}
 .acb-seed{opacity:0;transform-box:fill-box;transform-origin:center;}
 .acb-root[data-phase="theater"] .acb-seed{animation:acbSeedRise 3.4s cubic-bezier(.2,.7,.25,1) .95s both;}
 @keyframes acbSeedRise{
