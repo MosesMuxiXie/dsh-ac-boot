@@ -81,7 +81,7 @@ export const EARLY_HTML = String.raw`
   <div class="acbE-bottom">
     <span>DESKTOP <b>06</b></span>
     <span>LOCAL // SECURE BOOT</span>
-    <span>BUILD <b>14.0</b></span>
+    <span>BUILD <b>14.1</b></span>
   </div>
 </div>
 `;

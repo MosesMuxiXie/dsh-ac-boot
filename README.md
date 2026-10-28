@@ -6,7 +6,9 @@ DeepSeek Harness Web UI 的电影感开机序列：四段式**战术任务简报
 
 序列只属于**一次应用启动**：冷启动播放一次；休眠唤醒、托盘恢复、页面刷新都不会重播。
 
-当前版本：**0.14.0**
+当前版本：**0.14.1**
+
+> 0.14.1：把分区与航点的呼吸光晕重新加回来——每个分区一颗缓慢呼吸的径向光晕，品红主区一颗更强的光晕，航点带琥珀光晕与旋转射线。
 
 | 简报上行 | 战区态势 |
 | --- | --- |
@@ -17,7 +19,7 @@ DeepSeek Harness Web UI 的电影感开机序列：四段式**战术任务简报
 ## 这一版是什么
 
 1. **简报 / BRIEF（0–2.8s）**：暗场里一张全息指挥桌缓慢呼吸，左侧轨道环，右侧 `DEEPSEEK / HARNESS` 字标划开；`OPERATION // FIRST LIGHT`、加密上行状态、简报准备进度，右侧 `BRIEFING DATA`（TGT / GRID / UPLINK / STATUS）。
-2. **战区 / THEATER（2.8–7.2s）**：全幅虚构战区地图。Agnes 地形浮雕裁进原创大陆轮廓，青色发光海岸线；四个分区 + 品红主区软光；六个航点 `TGT-01…TGT-06`（PROFILE / SERVICES / WORKSPACE / SESSION / DISPLAY / LINK）沿琥珀航线依次点亮；左侧 `TGT INFO`，右侧 `BRIEFING DATA`，底部图例与网格刻度。
+2. **战区 / THEATER（2.8–7.2s）**：全幅虚构战区地图。Agnes 地形浮雕裁进原创大陆轮廓，青色发光海岸线；四个分区各带缓慢呼吸的径向光晕，品红主区一颗更强的品红光晕；六个航点 `TGT-01…TGT-06`（PROFILE / SERVICES / WORKSPACE / SESSION / DISPLAY / LINK）带琥珀光晕与旋转射线，沿琥珀航线依次点亮；左侧 `TGT INFO`，右侧 `BRIEFING DATA`，底部图例与网格刻度。
 3. **权限 / CONSOLE（7.2–10.8s）**：地图退暗，左侧 `OPERATOR ACCESS` 卡片逐条校验身份、凭据、本机配置并盖 `ACCESS GRANTED`；右侧系统检查列表、雷达扫描与遥测；背景是低透明度的 `CLASSIFIED` 分类水印。
 4. **标题 / TITLE（10.8–15s）**：地图线稿淡出，`DEEPSEEK` 大标题、`MISSION START` 任务开始章、三枚状态 chip、`按 Enter 继续` 与自动继续进度。
 
@@ -171,6 +173,7 @@ ln -s "$HOME/src/dsh-ac-boot" "$profileRoot/node_modules/@local/dsh-ac-boot"
 - 背景图版本：`ART_VERSION`（默认 `14`，换图时 +1）
 - 启动去重标记：`sessionStorage['acb-boot-played']`（清掉它可让下一次页面重载重新播放）
 - 战区形状：`CONTINENT`；分区：`REGIONS` / `PRIMARY_SECTOR`；航点：`NODES`；航线：`ROUTE`
+- 区域光晕：`REGION_GLOWS` 与 `.acb-region-glow`（呼吸 7.5s，主区 5.4s）；航点光晕 `acbNodeGlow` 与 `.acb-node-halo`、旋转射线 `.acb-node-rays`
 
 ## 交互
 

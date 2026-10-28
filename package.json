@@ -1,6 +1,6 @@
 {
   "name": "@local/dsh-ac-boot",
-  "version": "0.14.0",
+  "version": "0.14.1",
   "private": true,
   "type": "module",
   "repository": {
@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://github.com/MosesMuxiXie/dsh-ac-boot/issues"
   },
-  "description": "A tactical-briefing opening sequence for the DeepSeek Harness Web UI, drawn as an in-world mission briefing: a holographic command table, a full-bleed theater map, operator clearance and a mission-start title. v0.14.0 removes the literal aircraft key art and rebuilds the sequence around the tactical HUD/map language; Agnes now supplies only two abstract plates (terrain relief and the holographic table). The Host contract is unchanged from 0.13.0: name + inject=['webServer'], splash rows only, and a read-only /acb/assets route. The launch-scoped one-shot behaviour is preserved.",
+  "description": "A tactical-briefing opening sequence for the DeepSeek Harness Web UI, drawn as an in-world mission briefing: a holographic command table, a full-bleed theater map, operator clearance and a mission-start title. Each sector carries a slowly breathing radial glow and each waypoint a halo with rotating rays, so the map reads as a loaded tactical overlay rather than a flat illustration. v0.14.1 restores the breathing sector glows and waypoint halos; v0.14.0 removed the literal aircraft key art and rebuilds the sequence around the tactical HUD/map language; Agnes now supplies only two abstract plates (terrain relief and the holographic table). The Host contract is unchanged from 0.13.0: name + inject=['webServer'], splash rows only, and a read-only /acb/assets route. The launch-scoped one-shot behaviour is preserved.",
   "exports": {
     ".": "./index.js",
     "./client": "./client.js",

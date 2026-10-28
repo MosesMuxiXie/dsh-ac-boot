@@ -253,6 +253,12 @@ window.__ModuleLoader__.load({
       { d: 'M 410 570 L 765 455 L 905 700 L 555 705 Z', fill: 'rgba(40,140,165,.18)' },
       { d: 'M 765 455 L 1080 520 L 1180 705 L 905 700 Z', fill: 'rgba(70,190,205,.13)' },
     ];
+    const REGION_GLOWS = [
+      { cx: 500, cy: 390, rx: 300, ry: 220, tone: 'tea' },
+      { cx: 900, cy: 380, rx: 300, ry: 210, tone: 'bright' },
+      { cx: 640, cy: 585, rx: 280, ry: 200, tone: 'tea' },
+      { cx: 980, cy: 600, rx: 260, ry: 190, tone: 'bright' },
+    ];
     const PRIMARY_SECTOR = 'M 760 300 L 900 460 L 760 620 L 620 460 Z';
 
     const NODES = [
@@ -308,6 +314,21 @@ window.__ModuleLoader__.load({
             style: { '--acb-i': index },
             transform: 'translate(' + node.x + ' ' + node.y + ')',
           },
+          h('circle', { className: 'acb-node-halo', r: 46, fill: 'url(#acbNodeGlow)' }),
+          h(
+            'g',
+            { className: 'acb-node-rays' },
+            [0, 1, 2, 3, 4, 5].map(function (ray) {
+              const angle = (ray * Math.PI) / 3;
+              return h('line', {
+                key: 'ray-' + ray,
+                x1: Math.cos(angle) * 16,
+                y1: Math.sin(angle) * 16,
+                x2: Math.cos(angle) * 34,
+                y2: Math.sin(angle) * 34,
+              });
+            }),
+          ),
           h('circle', { className: 'acb-node-ping', r: 20 }),
           h('circle', { className: 'acb-node-ring', r: 12 }),
           h('circle', { className: 'acb-node-dot', r: 3.4 }),
@@ -340,6 +361,34 @@ window.__ModuleLoader__.load({
               h('stop', { offset: '0%', stopColor: 'rgba(2,10,14,.1)' }),
               h('stop', { offset: '62%', stopColor: 'rgba(2,8,12,.45)' }),
               h('stop', { offset: '100%', stopColor: 'rgba(1,5,8,.92)' }),
+            ),
+            h(
+              'radialGradient',
+              { id: 'acbGlowTea' },
+              h('stop', { offset: '0%', stopColor: 'rgba(96,226,244,.55)' }),
+              h('stop', { offset: '52%', stopColor: 'rgba(40,150,178,.22)' }),
+              h('stop', { offset: '100%', stopColor: 'rgba(8,40,52,0)' }),
+            ),
+            h(
+              'radialGradient',
+              { id: 'acbGlowBright' },
+              h('stop', { offset: '0%', stopColor: 'rgba(136,244,255,.62)' }),
+              h('stop', { offset: '52%', stopColor: 'rgba(56,188,216,.24)' }),
+              h('stop', { offset: '100%', stopColor: 'rgba(8,44,58,0)' }),
+            ),
+            h(
+              'radialGradient',
+              { id: 'acbGlowMagenta' },
+              h('stop', { offset: '0%', stopColor: 'rgba(238,96,156,.56)' }),
+              h('stop', { offset: '56%', stopColor: 'rgba(186,52,112,.2)' }),
+              h('stop', { offset: '100%', stopColor: 'rgba(52,8,28,0)' }),
+            ),
+            h(
+              'radialGradient',
+              { id: 'acbNodeGlow' },
+              h('stop', { offset: '0%', stopColor: 'rgba(255,206,140,.9)' }),
+              h('stop', { offset: '42%', stopColor: 'rgba(255,160,70,.28)' }),
+              h('stop', { offset: '100%', stopColor: 'rgba(60,30,8,0)' }),
             ),
             h(
               'pattern',
@@ -388,6 +437,31 @@ window.__ModuleLoader__.load({
             }),
           ),
           h('path', { d: CONTINENT, fill: 'url(#acbLandShade)', opacity: 0.55 }),
+          h(
+            'g',
+            { className: 'acb-region-glows', clipPath: 'url(#acbLandClip)' },
+            REGION_GLOWS.map(function (glow, index) {
+              return h('ellipse', {
+                key: 'region-glow-' + index,
+                className: 'acb-region-glow',
+                cx: glow.cx,
+                cy: glow.cy,
+                rx: glow.rx,
+                ry: glow.ry,
+                fill: 'url(#acbGlow' + (glow.tone === 'bright' ? 'Bright' : 'Tea') + ')',
+                style: { '--acb-i': index },
+              });
+            }),
+            h('ellipse', {
+              key: 'region-glow-primary',
+              className: 'acb-region-glow acb-region-glow-primary',
+              cx: 760,
+              cy: 460,
+              rx: 240,
+              ry: 190,
+              fill: 'url(#acbGlowMagenta)',
+            }),
+          ),
           h('path', {
             d: CONTINENT,
             fill: 'none',
@@ -1075,6 +1149,18 @@ window.__ModuleLoader__.load({
 .acb-map-route{opacity:.9;}
 .acb-route-dash{animation:acbDash 6s linear infinite;}
 @keyframes acbDash{to{stroke-dashoffset:-96}}
+.acb-region-glow{transform-box:fill-box;transform-origin:center;mix-blend-mode:screen;
+  animation:acbRegionBreathe 7.5s ease-in-out infinite alternate;
+  animation-delay:calc(var(--acb-i,0) * -1.7s);}
+@keyframes acbRegionBreathe{from{opacity:.5;transform:scale(.93)}to{opacity:1;transform:scale(1.07)}}
+.acb-region-glow-primary{animation-duration:5.4s;animation-delay:-1.2s;}
+.acb-node-halo{transform-box:fill-box;transform-origin:center;mix-blend-mode:screen;
+  animation:acbNodeHalo 3.6s ease-in-out infinite;
+  animation-delay:calc(var(--acb-i,0) * .28s);}
+@keyframes acbNodeHalo{0%,100%{opacity:.26;transform:scale(.86)}50%{opacity:.78;transform:scale(1.16)}}
+.acb-node-rays{transform-box:fill-box;transform-origin:center;opacity:.6;
+  animation:acbSpin 28s linear infinite;}
+.acb-node-rays line{stroke:rgba(255,196,120,.42);stroke-width:1;}
 .acb-map-node{opacity:.35;transition:opacity .6s ease;}
 .acb-map-node .acb-node-ping{fill:none;stroke:rgba(127,233,255,.5);stroke-width:1;
   transform-box:fill-box;transform-origin:center;animation:acbPing 3s ease-out infinite;
