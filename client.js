@@ -78,7 +78,7 @@ window.__ModuleLoader__.load({
       'aria.skip': '跳过开机动画',
       'skip.label': '跳过',
       'hud.op': '行动 // 第一缕光',
-      'hud.build': '版本 15.0 // 本地',
+      'hud.build': '版本 15.1 // 本地',
       'hud.theater': '本地战区 // 06',
       'hud.link': '链路安全',
       'brief.kicker': '战术简报 // 本地战区',
@@ -127,7 +127,7 @@ window.__ModuleLoader__.load({
       'aria.skip': 'Skip the boot sequence',
       'skip.label': 'SKIP',
       'hud.op': 'OPERATION // FIRST LIGHT',
-      'hud.build': 'BUILD 15.0 // LOCAL',
+      'hud.build': 'BUILD 15.1 // LOCAL',
       'hud.theater': 'LOCAL THEATER // 06',
       'hud.link': 'LINK SECURE',
       'brief.kicker': 'TACTICAL BRIEFING // LOCAL THEATER',
@@ -410,16 +410,33 @@ window.__ModuleLoader__.load({
       graticule.push(h('line', { key: 'axis-x', className: 'axis', x1: 0, y1: 450, x2: 1600, y2: 450 }));
       graticule.push(h('line', { key: 'axis-y', className: 'axis', x1: 800, y1: 0, x2: 800, y2: 900 }));
       const nodes = NODES.map(function (node, index) {
-        const count = node.hub ? 18 : 10;
+        const count = node.hub ? 120 : 56;
         const rays = [];
         for (let ray = 0; ray < count; ray += 1) {
-          const angle = (ray / count) * Math.PI * 2 + index * 0.6;
-          const length = node.hub ? 180 + ((ray * 67 + index * 29) % 260) : 70 + ((ray * 41 + index * 17) % 120);
-          const far = node.hub && ray % 6 === 0;
+          const angle = (ray / count) * Math.PI * 2 + index * 0.37;
+          const tier = ray % 10 === 0 ? 'long' : ray % 3 === 0 ? 'mid' : 'fine';
+          let length = 24 + ((ray * 37 + index * 53) % 110);
+          if (tier === 'mid') length = 96 + ((ray * 61 + index * 17) % 190);
+          if (tier === 'long') length = 210 + ((ray * 89 + index * 41) % 300);
+          if (ray % 30 === 0) length += 140;
           rays.push(
             h('line', {
               key: 'ray' + ray,
-              className: (ray % 4 === 0 ? 'bright' : '') + (far ? ' far' : ''),
+              className: tier + (ray % 30 === 0 ? ' hot' : ''),
+              x1: 0,
+              y1: 0,
+              x2: (Math.cos(angle) * length).toFixed(1),
+              y2: (Math.sin(angle) * length).toFixed(1),
+            }),
+          );
+        }
+        for (let spike = 0; spike < 4; spike += 1) {
+          const angle = (spike * Math.PI) / 2 + (node.hub ? 0.12 : 0.2);
+          const length = node.hub ? 620 : 300;
+          rays.push(
+            h('line', {
+              key: 'spike' + spike,
+              className: 'spike',
               x1: 0,
               y1: 0,
               x2: (Math.cos(angle) * length).toFixed(1),
@@ -435,10 +452,11 @@ window.__ModuleLoader__.load({
             style: { '--acb-i': index },
             transform: 'translate(' + node.x + ' ' + node.y + ')',
           },
-          h('circle', { className: 'acb-node-halo', r: node.hub ? 56 : 32, fill: 'url(#acbNodeGlow)' }),
+          h('circle', { className: 'acb-node-halo', r: node.hub ? 74 : 44, fill: 'url(#acbNodeGlow)' }),
+          h('circle', { className: 'acb-node-halo acb-node-halo-core', r: node.hub ? 34 : 22, fill: 'url(#acbNodeCore)' }),
           h('g', { className: 'acb-node-rays' }, rays),
           h('circle', { className: 'acb-node-ring', r: node.hub ? 9 : 5.5 }),
-          h('circle', { className: 'acb-node-dot', r: node.hub ? 3.2 : 2 }),
+          h('circle', { className: 'acb-node-dot', r: node.hub ? 3.4 : 2.2 }),
           node.hub
             ? h('text', { className: 'acb-node-tag', x: 14, y: -10 }, node.tag)
             : null,
@@ -496,6 +514,13 @@ window.__ModuleLoader__.load({
                 h('stop', { offset: '0%', stopColor: 'rgba(226,250,255,.95)' }),
                 h('stop', { offset: '38%', stopColor: 'rgba(150,230,255,.3)' }),
                 h('stop', { offset: '100%', stopColor: 'rgba(30,90,120,0)' }),
+              ),
+              h(
+                'radialGradient',
+                { id: 'acbNodeCore' },
+                h('stop', { offset: '0%', stopColor: 'rgba(255,255,255,.98)' }),
+                h('stop', { offset: '28%', stopColor: 'rgba(224,252,255,.6)' }),
+                h('stop', { offset: '100%', stopColor: 'rgba(120,220,255,0)' }),
               ),
               h(
                 'filter',
@@ -1197,13 +1222,15 @@ window.__ModuleLoader__.load({
 .acb-city circle{fill:rgba(220,250,255,.9);}
 .acb-city text{fill:rgba(196,238,255,.62);font-size:8px;letter-spacing:.14em;}
 .acb-node{opacity:.9;}
-.acb-node-rays{transform-box:fill-box;transform-origin:center;animation:acbSpin 60s linear infinite;}
-.acb-node-rays line{stroke:rgba(170,235,255,.26);stroke-width:1;}
-.acb-node-rays line.bright{stroke:rgba(220,250,255,.55);}
-.acb-node-rays line.far{stroke:rgba(214,248,255,.34);stroke-width:.8;}
+.acb-node-rays line{stroke:rgba(190,240,255,.14);stroke-width:.6;}
+.acb-node-rays line.mid{stroke:rgba(214,250,255,.26);stroke-width:.75;}
+.acb-node-rays line.long{stroke:rgba(238,253,255,.42);stroke-width:.9;}
+.acb-node-rays line.hot{stroke:rgba(255,255,255,.62);stroke-width:1.1;}
+.acb-node-rays line.spike{stroke:rgba(255,255,255,.32);stroke-width:.9;}
 .acb-node-ring{fill:rgba(4,14,22,.5);stroke:rgba(190,246,255,.6);stroke-width:1;}
 .acb-node-dot{fill:#e8fdff;filter:drop-shadow(0 0 6px rgba(190,246,255,.95));}
 .acb-node-halo{mix-blend-mode:screen;opacity:.85;}
+.acb-node-halo-core{mix-blend-mode:screen;opacity:.95;}
 .acb-node-label{fill:rgba(214,246,255,.85);font-size:8.5px;letter-spacing:.16em;}
 .acb-node-tag{fill:rgba(255,190,130,.68);font-size:7px;letter-spacing:.14em;}
 .acb-rails{position:absolute;top:15vh;z-index:4;width:200px;font-size:7.5px;line-height:1.75;

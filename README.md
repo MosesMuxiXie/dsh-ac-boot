@@ -6,9 +6,11 @@ DeepSeek Harness Web UI 的电影感开机序列：四段式**战术任务简报
 
 序列只属于**一次应用启动**：冷启动播放一次；休眠唤醒、托盘恢复、页面刷新都不会重播。
 
-当前版本：**0.15.0**
+当前版本：**0.15.1**
 
 > 0.15.0：战区段重做成完整的任务简报界面——程序化海岸线 + 经纬网格 + `SAT DATA LINK` / `PLATE` 数据栏 + 多节点长射线 + 品红 `LOCAL THEATER` 高亮 + 底部任务字幕。
+
+> 0.15.1：射线爆发加密——每个节点从密集的亮核向外分三层（细 / 中 / 长）散开，另加四向十字长射线，密度大幅提高。
 
 | 简报上行 | 战区态势 |
 | --- | --- |
@@ -19,7 +21,7 @@ DeepSeek Harness Web UI 的电影感开机序列：四段式**战术任务简报
 ## 这一版是什么
 
 1. **简报 / BRIEF（0–2.8s）**：暗场里一张全息指挥桌缓慢呼吸，左侧轨道环，右侧 `DEEPSEEK / HARNESS` 字标划开；`OPERATION // FIRST LIGHT`、加密上行状态、简报准备进度，右侧 `BRIEFING DATA`（TGT / GRID / UPLINK / STATUS）。
-2. **战区 / THEATER（2.8–7.2s）**：全幅全息战区图。程序化海岸线 + 青色发光描边，经纬网格与坐标刻度；左右两列数据栏——`SAT DATA LINK / UPLOAD STATUS / NODE STATUS` 与 `PLATE 06 // LOCAL / THEATER GRID`；12 个数据节点带长短不一的射线爆发，4 个主节点更亮；品红 `LOCAL THEATER` 高亮区、城市标签与底部双语任务字幕。
+2. **战区 / THEATER（2.8–7.2s）**：全幅全息战区图。程序化海岸线 + 青色发光描边，经纬网格与坐标刻度；左右两列数据栏——`SAT DATA LINK / UPLOAD STATUS / NODE STATUS` 与 `PLATE 06 // LOCAL / THEATER GRID`；12 个数据节点从密集亮核向外分三层（细 / 中 / 长）散开，另有四向十字长射线，4 个主节点更亮；品红 `LOCAL THEATER` 高亮区、城市标签与底部双语任务字幕。
 3. **权限 / CONSOLE（7.2–10.8s）**：战区图退暗，左侧 `OPERATOR ACCESS` 卡片逐条校验身份、凭据、本机配置并盖 `ACCESS GRANTED`；右侧系统检查列表、雷达扫描与遥测；背景是低透明度的 `CLASSIFIED` 分类水印。
 4. **标题 / TITLE（10.8–15s）**：地图线稿淡出，`DEEPSEEK` 大标题、`MISSION START` 任务开始章、三枚状态 chip、`按 Enter 继续` 与自动继续进度。
 
