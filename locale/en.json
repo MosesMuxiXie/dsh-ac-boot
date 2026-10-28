@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title": "Ace Combat Boot Sequence",
-    "description": "A four-beat aerial-combat opening painted with Agnes key art: mission-table briefing, carrier-deck launch, storm climb, and a sunset title above the clouds. The HUD is drawn in code; the launch is scoped to one application start and never replays on wake from sleep, tray restore or a page reload. About 15 seconds, skippable."
+    "title": "Tactical Briefing Boot",
+    "description": "A four-beat tactical mission-briefing opening: holographic command table, full-bleed theater map, operator access / systems check, and a mission-start title. The map, route, waypoints, radar and HUD are drawn in code; the terrain relief and holographic table plates are generated with Agnes. No aircraft or photographic combat footage. About 15 seconds, skippable, and played once per application start (never on wake from sleep, tray restore or page reload)."
   }
 }

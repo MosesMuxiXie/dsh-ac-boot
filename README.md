@@ -1,61 +1,61 @@
-# 皇牌空战式开机序列 · DSH Ace Combat Boot
+# 战术简报开机序列 · DSH Tactical Briefing Boot
 
-DeepSeek Harness Web UI 的电影感开机序列：四段式空战任务开场，画面由 **Agnes 生成的四张原始键 art** 构成——作战会议桌、航母甲板放飞、雷暴爬升、云海日落大标题。默认约 15 秒，四段自动衔接，结束淡入工作区。
+DeepSeek Harness Web UI 的电影感开机序列：四段式**战术任务简报**开场——全息指挥桌上行、全幅战区态势图、操作员权限与系统检查、任务开始大标题。
+
+这一版刻意回避写实空战照片：**没有战机、甲板、云海日落**。画面主体是任务简报界面本身——虚构战区地图、航线与航点、分区光晕、雷达、情报面板、分类印章与 HUD 文字；地图、线稿和 HUD 全部由代码绘制，Agnes 只负责两张抽象底材（地形浮雕 + 全息指挥桌）。默认约 15 秒，四段自动衔接，结束淡入工作区。
 
 序列只属于**一次应用启动**：冷启动播放一次；休眠唤醒、托盘恢复、页面刷新都不会重播。
 
-当前版本：**0.13.0**
+当前版本：**0.14.0**
 
-| 简报 | 起飞 |
+| 简报上行 | 战区态势 |
 | --- | --- |
-| ![作战会议](docs/boot-brief.jpg) | ![甲板放飞](docs/boot-launch.jpg) |
-| **爬升** | **标题** |
-| ![雷暴爬升](docs/boot-ascent.jpg) | ![云海日落](docs/boot-title.jpg) |
+| ![简报上行](docs/boot-brief.jpg) | ![战区态势](docs/boot-theater.jpg) |
+| **操作员权限** | **任务开始** |
+| ![操作员权限](docs/boot-console.jpg) | ![任务开始](docs/boot-title.jpg) |
 
-## 这版是什么
+## 这一版是什么
 
-四段 Beats，全部 16:9 全幅铺满，HUD 由代码绘制、画面由 Agnes 绘制：
+1. **简报 / BRIEF（0–2.8s）**：暗场里一张全息指挥桌缓慢呼吸，左侧轨道环，右侧 `DEEPSEEK / HARNESS` 字标划开；`OPERATION // FIRST LIGHT`、加密上行状态、简报准备进度，右侧 `BRIEFING DATA`（TGT / GRID / UPLINK / STATUS）。
+2. **战区 / THEATER（2.8–7.2s）**：全幅虚构战区地图。Agnes 地形浮雕裁进原创大陆轮廓，青色发光海岸线；四个分区 + 品红主区软光；六个航点 `TGT-01…TGT-06`（PROFILE / SERVICES / WORKSPACE / SESSION / DISPLAY / LINK）沿琥珀航线依次点亮；左侧 `TGT INFO`，右侧 `BRIEFING DATA`，底部图例与网格刻度。
+3. **权限 / CONSOLE（7.2–10.8s）**：地图退暗，左侧 `OPERATOR ACCESS` 卡片逐条校验身份、凭据、本机配置并盖 `ACCESS GRANTED`；右侧系统检查列表、雷达扫描与遥测；背景是低透明度的 `CLASSIFIED` 分类水印。
+4. **标题 / TITLE（10.8–15s）**：地图线稿淡出，`DEEPSEEK` 大标题、`MISSION START` 任务开始章、三枚状态 chip、`按 Enter 继续` 与自动继续进度。
 
-1. **简报 / BRIEF**：全息作战会议桌在暗场里缓慢漂移；左边一枚原创菱形翼徽章，右边 `DEEPSEEK / HARNESS` 字标划开，`OPERATION // FIRST LIGHT` 与指挥链路进度条逐步建立。
-2. **放飞 / LAUNCH**：航母甲板，弹射器蒸汽与琥珀跑道灯；锁定框压住机头，白字盖章 `LAUNCH CLEARANCE`，`PROFILE READ → SERVICES START → WORKSPACE INDEX → DISPLAY SYNC` 逐行点亮。
-3. **爬升 / ASCENT**：雷暴云层中的加力爬升，镜头轻震；左侧 `OPERATOR ACCESS` 卡片逐条校验身份、凭据与本机配置，右侧雷达开始扫描，`ACCESS GRANTED` 盖章。
-4. **标题 / TITLE**：云海日落，战机拖着两条尾迹飞向太阳；大标题、三枚状态 chip、`按 Enter 继续` 与自动继续进度条，任务完成 HUD。
-
-画面是原创生成图，不含任何游戏截图、字体、音频、标志或商标；"皇牌空战风格"指空战任务简报的构图与 HUD 语汇，不是对具体作品的复制。
+地图是原创虚构战区，不读取真实工作区数据，也不映射现实地理。
 
 ## 画面资产（Agnes）
 
-四张背景由 Agnes 图像模型 `agnes-image-2.5-flash` 生成，提示词只描述原创空战场景（虚构战机、原始构图、无标志无文字），成品转为 JPEG 放在 `assets/`：
+两张抽象底材由 Agnes 图像模型 `agnes-image-2.5-flash` 生成，JPEG 合计约 396 KB：
 
-| 文件 | 场景 |
+| 文件 | 用途 |
 | --- | --- |
-| `assets/briefing.jpg` | 俯视全息作战桌，发光线路线与航点 |
-| `assets/deck.jpg` | 黎明航母甲板，弹射蒸汽与琥珀灯光 |
-| `assets/ascent.jpg` | 雷暴云层中的加力爬升 |
-| `assets/horizon.jpg` | 云海日落与双尾迹战机 |
+| `assets/terrain.jpg` | 俯视地形浮雕，作为 SVG 大陆轮廓内的 `<pattern>` 填充 |
+| `assets/holo.jpg` | 全息指挥桌，作为简报 / 权限段的暗底与景深 |
+
+提示词只描述抽象材质（地形、全息地图与数据面板），不包含战机、人物或文字；完整提示词与请求参数见 [docs/agnes-prompts.md](docs/agnes-prompts.md)。
 
 Host 半侧把它们挂在 `/acb/assets/<name>.jpg` 下只读输出；客户端按 `?v=<ART_VERSION>` 取图并预加载。换图时把 `client.js` 里的 `ART_VERSION` 加一，再刷新插件即可，不需要重启 Host。
 
-## v0.13.0：启动兼容性修复
+## v0.13.0 启动兼容性修复（本版沿用）
 
-v0.12.0 之后 DSH 出现过一次启动失败（`Host startup exceeded 60 seconds`），启动日志里 ac-boot 留下了这条报错：
+v0.12.0 之后 DSH 出现过一次启动失败（`Host startup exceeded 60 seconds`），启动日志里 ac-boot 留下了报错：
 
 ```
 [ac-boot] workspace data route was not registered
 Error: cannot get property "webServer" without inject
 ```
 
-原因是 Host 半侧在没有声明 `inject` 的情况下读取了 `webServer` / `workspaceRegistry`。旧版还因此在每次启动时抛错；地图数据实际上从未取到真实工作区，一直用的是内置示例。
+原因是 Host 半侧在没有声明 `inject` 的情况下读取了 `webServer` / `workspaceRegistry`；而且旧版的"实时工作区数据"从未成功，地图一直用的是内置示例。
 
-v0.13.0 的 Host 半侧被收窄到最小：
+现在的 Host 半侧被收窄到最小：
 
 - 显式导出 `name` 与 `inject = ['webServer']`，不再读取 `workspaceRegistry`；
-- 不注册 `/acb/workspaces`，不做任何工作区快照；
-- 注入表只保留首帧 splash 的 `html` + `style` 两行（不再新增 `script` 行）；
+- 不注册 `/acb/workspaces`，不做工作区快照；
+- 注入表只保留首帧 splash 的 `html` + `style` 两行；
 - 唯一新增的常驻内容是 `/acb/assets/` 只读静态路由；
 - 所有回调都包在 `try/catch` 里，激活阶段没有 await、没有网络请求、没有同步重活。
 
-也就是说，这个插件现在**没有能力拖慢或打断 Host 启动**；最坏情况只是图片路由缺失，客户端退回深色渐变背景。
+也就是说，这个插件现在**没有能力拖慢或打断 Host 启动**；最坏情况只是图片路由缺失，客户端退回纯代码线稿地图。
 
 ## 安装
 
@@ -109,8 +109,8 @@ ln -s "$HOME/src/dsh-ac-boot" "$profileRoot/node_modules/@local/dsh-ac-boot"
 ### 3. 重启边界
 
 - **首次安装 / 重新启用**：需要完整退出 DSH（托盘 → 退出，或应用菜单退出）再启动一次。桌面端会在 Host 进程启动时缓存 `webserver/index-inject` 的注入结果，因此首帧 splash 和 `/acb/assets` 这类 Host 侧内容必须等一次应用级重启。
-- **之后的客户端更新**（画面、HUD、文案、时序）：可以用 DSH 的**插件刷新 / Unlag 刷新**重载客户端，不必完整退出应用。见下面的「热加载」。
-- **换背景图**：更新 `assets/*.jpg`，把 `client.js` 的 `ART_VERSION` 加一，再刷新插件；图片路由每次请求都读磁盘，不需要重启 Host。
+- **之后的客户端更新**（地图、面板、文案、时序）：可以用 DSH 的**插件刷新 / Unlag 刷新**重载客户端，不必完整退出应用。见下面的「热加载」。
+- **换底材**：更新 `assets/*.jpg`，把 `client.js` 的 `ART_VERSION` 加一，再刷新插件；图片路由每次请求都读磁盘，不需要重启 Host。
 
 ## 启动行为
 
@@ -139,7 +139,7 @@ ln -s "$HOME/src/dsh-ac-boot" "$profileRoot/node_modules/@local/dsh-ac-boot"
 
 推荐工作流：
 
-1. 修改 `client.js` / HUD / 画面文案；
+1. 修改 `client.js` / HUD / 地图 / 文案；
 2. 在 DSH 里触发插件刷新（Unlag / 插件管理器重载）；
 3. 如果新模块是同一窗口热替换，会自动重播；整页重载则按上面的快捷键手动预览。
 
@@ -151,24 +151,26 @@ ln -s "$HOME/src/dsh-ac-boot" "$profileRoot/node_modules/@local/dsh-ac-boot"
 | --- | --- |
 | `index.js` | Host 半侧：首帧 splash 注入、`/acb/assets/` 只读图库路由；`inject = ['webServer']` |
 | `boot-splash.js` | 首帧 splash 的 HTML/CSS，无脚本、8 秒淡出兜底 |
-| `client.js` | 四段空战开场、HUD、Agnes 背景、启动去重、热重播、i18n、跳过与减少动态 |
-| `assets/*.jpg` | Agnes 生成的四张 16:9 背景（约 590 KB） |
+| `client.js` | 四段战术简报、SVG 战区图、HUD、启动去重、热重播、i18n、跳过与减少动态 |
+| `assets/terrain.jpg` | Agnes 地形浮雕（裁进大陆轮廓做填充） |
+| `assets/holo.jpg` | Agnes 全息指挥桌（简报 / 权限段暗底） |
 | `cordis.patch.yml` | bundle 插入 `ac-boot` 插件行 |
 | `locale/*.json` | 插件管理页标题与描述 |
 | `icon.svg` | 插件图标 |
 | `docs/boot-*.jpg` | 四段画面预览 |
-| `docs/agnes-prompts.md` | 四张背景的原始 Agnes 提示词与请求参数 |
+| `docs/agnes-prompts.md` | 两张底材的原始 Agnes 提示词与请求参数 |
 | `scripts/agnes-gen.mjs` | Agnes 生图辅助脚本（开发用，从 `AGNES_API_KEY` 读 Key） |
 
 ## 调参
 
 - 总时长：`client.js` 顶部 `DURATION_MS`（默认 `15000`）
-- 四段切换：`PHASES`（默认 `0 / 2600 / 6200 / 9800 ms`）
+- 四段切换：`PHASES`（默认 `0 / 2800 / 7200 / 10800 ms`）
 - 减少动态效果时长：`REDUCED_MS`（默认 `5200`）
 - 淡入淡出：`FADE_MS`（默认 `800`）
 - 覆盖层级：`ORDER`（默认 `9000`）
-- 背景图版本：`ART_VERSION`（默认 `13`，换图时 +1）
-- 启动去重标记：`sessionStorage['acb-boot-played']`（客户端与 splash 去重共用；清掉它可让下一次页面重载重新播放）
+- 背景图版本：`ART_VERSION`（默认 `14`，换图时 +1）
+- 启动去重标记：`sessionStorage['acb-boot-played']`（清掉它可让下一次页面重载重新播放）
+- 战区形状：`CONTINENT`；分区：`REGIONS` / `PRIMARY_SECTOR`；航点：`NODES`；航线：`ROUTE`
 
 ## 交互
 
@@ -180,16 +182,17 @@ ln -s "$HOME/src/dsh-ac-boot" "$profileRoot/node_modules/@local/dsh-ac-boot"
 
 ## 设计说明
 
-- 视觉语言参考空战任务简报/游戏 HUD 的构图与信息密度，**代码、HUD、图标全部原创，背景图由 Agnes 依据原创提示词生成，不含任何游戏素材、字体、音频、商标或真实机徽**。
-- 四段动画只对 `transform` / `opacity` / `clip-path` 等合成属性做过渡；React 只切换阶段，不写逐帧样式。
-- 背景图是 1312×736 JPEG，按 `cover` 铺满；大屏上依赖暗角、扫描线与颗粒遮瑕，属于电影感的静态底图而不是 4K 素材。
+- 战区轮廓、分区、航线、航点、徽章与全部 HUD 文字都是原创代码绘制；地形浮雕与全息底材由 Agnes 依据原创提示词生成，不含任何游戏素材、字体、音频、商标或真实机徽。
+- 这片大陆是虚构剧场，不映射现实地理，也不包含任何真实国家轮廓。
+- 动画只对 `transform` / `opacity` / `stroke-dashoffset` / `clip-path` 等合成属性做过渡；React 只切换阶段，不写逐帧样式。
 - 已知限制：DSH 桌面端缓存 Host 注入是平台行为，无法从插件侧绕过；因此 splash 和 `/acb/assets` 路由的更新始终需要一次应用级重启。
 
 ## 生成记录
 
-- 图像模型：Agnes `agnes-image-2.5-flash`，尺寸 1280×720（上游返回 1312×736），seed 未固定，四张各一次成功生成。
-- 提示词只描述原创场景，例如“劫持航母甲板黎明放飞”（对应 `deck.jpg`）、“云海日落双尾迹战机”（对应 `horizon.jpg`），并明确要求 no text / no logos / no insignia / no real-world aircraft markings。
-- 成品压缩为 JPEG（quality 90），合计约 590 KB，随仓库分发。
+- 图像模型：Agnes `agnes-image-2.5-flash`，尺寸 1280×720（上游返回 1312×736）。
+- `terrain.jpg`：俯视地形浮雕（深海蓝绿岩体、琥珀谷地、青色山脊高光），提示词要求 no text / no labels / no roads / no borders / no coastlines。
+- `holo.jpg`：黑底全息指挥桌（半透明地图网格、等高线、读数面板、青色与琥珀光），提示词要求 no text / no letters / no aircraft / no people。
+- v0.14.0 移除了 v0.13.0 的四张战机写实键 art（仅保留在 git 历史与 `v0.13.0` 标签里），因为这一版明确采用战术简报界面语言。
 
 ## License
 

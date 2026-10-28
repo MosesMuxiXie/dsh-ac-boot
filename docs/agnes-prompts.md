@@ -1,14 +1,12 @@
 # Agnes generation notes
 
-The four backdrops in `assets/` were generated with the Agnes image model
-`agnes-image-2.5-flash` through `POST /v1/images/generations`:
+v0.14.0 uses two abstract plates in `assets/`, generated with the Agnes image
+model `agnes-image-2.5-flash` through `POST /v1/images/generations`:
 
 | Output | Requested size | Prompt (verbatim) |
 | --- | --- | --- |
-| `assets/briefing.jpg` | `1280x720` | Cinematic tactical mission-briefing room: top-down view of a dark holographic war table projecting a glowing topographic map with waypoint markers and route lines, cyan and amber light, classified folders and a flight helmet on the table, volumetric haze, dramatic military command atmosphere, widescreen 16:9, ultra-detailed original concept art, no text, no legible letters, no logos |
-| `assets/deck.jpg` | `1280x720` | Cinematic military-aviation key art: an original fictional fighter jet on a dark aircraft-carrier flight deck at dawn, steam rising from the catapult, amber runway lights reflected on the wet deck, deck-crew silhouettes, deep blue storm sky with breaking amber light, dramatic rim lighting, low angle, widescreen 16:9, ultra-detailed original concept art, no text, no logos, no insignia, no real-world aircraft markings |
-| `assets/ascent.jpg` | `1280x720` | Cinematic aerial-combat game key art: an original fictional fighter jet climbing through a storm cloud layer at extreme speed, bright afterburner, spiral contrails, lightning glow, dramatic low angle from below, deep blue and amber palette, motion energy, widescreen 16:9, ultra-detailed original concept art, no text, no logos, no insignia, no real-world aircraft markings |
-| `assets/horizon.jpg` | `1280x720` | Cinematic aerial-combat game title-screen artwork: the silhouette of an original fictional fighter jet flying high above an endless sea of clouds at sunset, a huge glowing orange horizon, long contrails, anamorphic lens flare, deep teal sky above, volumetric clouds, dramatic backlight, widescreen composition with open negative space in the center for a title, ultra-detailed original concept art, no text, no logos, no insignia, no real-world aircraft markings |
+| `assets/terrain.jpg` | `1280x720` | Cinematic top-down terrain relief texture for a fictional tactical map: rugged mountain ridges and valleys seen from directly above, deep teal stone with warm amber valleys and thin cyan ridge highlights, subtle topographic striations, abstract aerial cartography, high detail, moody cinematic light, no text, no labels, no roads, no borders, no coastlines, no symbols, widescreen 16:9 |
+| `assets/holo.jpg` | `1280x720` | Abstract holographic tactical command display floating in dark space: layered translucent map grids, glowing topographic contour lines, small readout panels and reticles, cyan and amber light, volumetric haze, depth of field, no text, no letters, no numbers, no aircraft, no people, cinematic, widescreen 16:9, deep black background |
 
 Request body:
 
@@ -28,3 +26,12 @@ variations — iterate on the prompt, then bump `ART_VERSION` in `client.js`.
 
 `scripts/agnes-gen.mjs` is the small generator used for this (it reads
 `AGNES_API_KEY` from the environment and never writes the key to disk).
+
+## Retired in v0.14.0
+
+v0.13.0 shipped four literal combat-aviation key art plates (mission table,
+carrier deck, storm climb, sunset horizon). The direction of this project is an
+in-world **tactical briefing interface**, not photographic aircraft, so those
+plates were removed from `assets/` and their prompts are kept only in the
+v0.13.0 tag. The replacement set above is deliberately abstract: terrain and a
+holographic command table, with every UI element drawn in code.
