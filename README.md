@@ -2,7 +2,9 @@
 
 DeepSeek Harness Web UI 的电影感开机序列，受战术任务简报界面启发：星场 + 全息上行、全幅工作区剧场地图、操作员登录、星球地平线标题。默认约 15 秒，四段自动衔接，结束淡入工作区。
 
-当前版本：**0.11.0**
+序列只属于**一次应用启动**：冷启动播放一次，休眠唤醒、托盘恢复、页面刷新都不会重播。
+
+当前版本：**0.12.0**
 
 ![工作区剧场地图（组件静态预览，示例数据）](docs/workspace-map.png)
 
@@ -74,12 +76,25 @@ ln -s "$HOME/src/dsh-ac-boot" "$profileRoot/node_modules/@local/dsh-ac-boot"
 ### 3. 重启边界
 
 - **首次安装**：需要完整退出 DSH（托盘 → 退出，或应用菜单退出）再启动一次。桌面端会在 Host 进程启动时缓存 `webserver/index-inject` 的注入结果，因此首帧 splash 和 `/acb/workspaces` 这类 Host 侧内容必须等一次应用级重启。
-- **之后的客户端更新**（地图、动画、CSS、区域、光照）：可以直接用 DSH 的**插件刷新 / Unlag 刷新**重载客户端，不必完整退出应用。见下面的「热加载」。
+- **之后的客户端更新**（地图、动画、CSS、区域、光照、启动去重）：可以直接用 DSH 的**插件刷新 / Unlag 刷新**重载客户端，不必完整退出应用。见下面的「热加载」。
 - **页面普通刷新**：不保证能拿到新的客户端模块——桌面端可能复用启动时的模块图。优先用插件刷新。
+- **v12 的 splash 前置 guard**：`index.js` 新增一段内联脚本，在首绘前按启动标记移除 splash；它属于 Host 注入，同样需要一次应用级重启才会随新注入生效。客户端去重本身改在 `client.js`，插件刷新即可先生效。
+
+## 启动行为
+
+开机序列只属于一次应用启动：
+
+- 冷启动 DSH（完全退出后重新启动）播放一次；
+- 休眠 / 睡眠唤醒、锁屏恢复、托盘窗口重新打开、同一窗口内页面重载都不会自动重播；
+- 播放开始时客户端往 `sessionStorage` 写入 `acb-boot-played` 标记。同一窗口会话内再加载页面时，客户端直接跳过序列；Host 注入的首帧 splash 也会在首绘前移除，不会闪一下；
+- 手动重播始终可用：`Ctrl+Alt+Shift+B` 或控制台 `window.__ACB_REPLAY()`；同一窗口内插件模块热替换（HMR）仍会自动重播一次，方便预览；
+- 想再看一次冷启动效果：把 DSH 完全退出（托盘 → 退出）再启动。
+
+> 为什么用 `sessionStorage`：它跟着窗口会话走。页面重载、休眠唤醒、Electron 渲染进程重载都保留它，所以不会重播；真正退出应用时窗口会话销毁，标记随之消失，下次启动重新播放。
 
 ## 热加载
 
-客户端模块带 build fingerprint。同一窗口内模块被热替换时，新的 `BootHost` 会检测到新 build 并自动重播整个开场，不需要退出应用。
+客户端模块带 build fingerprint。同一窗口内模块被热替换时，新的 `BootHost` 会检测到新 build 并自动重播整个开场，不需要退出应用。整页重载（Unlag 的界面重建走页面重载）不会自动重播，用下面的手动入口预览。
 
 手动重播：
 
@@ -94,7 +109,7 @@ ln -s "$HOME/src/dsh-ac-boot" "$profileRoot/node_modules/@local/dsh-ac-boot"
 
 1. 修改 `client.js` / 地图 / CSS；
 2. 在 DSH 里触发插件刷新（Unlag / 插件管理器重载）；
-3. 新模块加载后自动重播；如果没自动播放，按上面的快捷键。
+3. 如果新模块是同一窗口热替换，会自动重播；整页重载则按上面的快捷键手动预览。
 
 只有改 Host 半侧（`index.js`、`boot-splash.js`、splash 注入、`/acb/workspaces` 路由）才需要应用级重启。
 
@@ -113,9 +128,9 @@ Host 通过 `workspaceRegistry.list()` 生成快照：
 
 | 文件 | 说明 |
 | --- | --- |
-| `index.js` | Host 半侧：注入首帧 splash、启动快照、`/acb/workspaces` 路由 |
+| `index.js` | Host 半侧：注入首帧 splash、splash 去重 guard、启动快照、`/acb/workspaces` 路由 |
 | `boot-splash.js` | 首帧 splash 的 HTML/CSS，无脚本、8 秒淡出兜底 |
-| `client.js` | 四段开机序列、全幅地图、多节点 rays、地形、热重播、i18n、跳过与减少动态 |
+| `client.js` | 四段开机序列、全幅地图、多节点 rays、地形、启动去重、热重播、i18n、跳过与减少动态 |
 | `cordis.patch.yml` | bundle 插入 `ac-boot` 插件行 |
 | `locale/*.json` | 插件管理页标题与描述 |
 | `icon.svg` | 插件图标 |
@@ -132,13 +147,13 @@ Host 通过 `workspaceRegistry.list()` 生成快照：
 - 地图区域数、锚点、配色：`client.js` 中 `WORKSPACE_MAP_ANCHORS` 与 `WorkspaceMap`
 - 区域热度曲线：`heat = Math.pow(ratio, 1.12)`，以及 `fillOpacity` / 径向光晕
 - 多点 rays / 连线：`nodeBursts`、`relayBursts`、`networkLinks`
-- 窗口重开兜底：`REPLAY_ON_FOCUS`（默认 `false`）
+- 启动去重标记：`sessionStorage['acb-boot-played']`（`client.js` 与 `index.js` 的前置 guard 共用；清掉它可让下一次页面重载重新播放）
 
 ## 交互
 
 - 点击任意处 / `Esc` / `Enter` / `Space` 跳过；
-- 窗口关闭到托盘后重新打开会重播；
-- 动画中隐藏窗口，回来会继续；结束后隐藏再打开会重播；
+- 动画中隐藏窗口，回来会继续，不会从头重播；
+- 播放结束后隐藏 / 重新打开窗口、休眠唤醒都不会重播；需要重看用上面的手动重播；
 - `prefers-reduced-motion` 下显示约 5 秒的静态版，保留信息、去掉位移与强光；
 - 地图覆盖层使用 `shell.overlay` 槽位，遮住桌面宠物等底层元素。
 

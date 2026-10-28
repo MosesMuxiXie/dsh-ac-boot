@@ -18,8 +18,10 @@
  *
  * The Host half injects a static pre-boot splash before the frontend creates
  * its own boot card; this module removes that splash on its first layout pass.
- * A BootHost controller replays the run when the desktop window is hidden to
- * the tray and reopened, without replaying on HMR or a plain Alt+Tab.
+ * The run belongs to the application launch: BootHost records a flag in
+ * sessionStorage once the sequence starts, so waking from sleep, restoring the
+ * tray window or reloading the page never replays it. Only a plugin hot
+ * refresh (an explicit authoring action) previews a new build again.
  *
  * Original artwork only: no game screenshots, fonts, audio or trademarks.
  */
@@ -38,7 +40,12 @@ window.__ModuleLoader__.load({
     const SKIP_FADE_MS = 240;
     const ORDER = 9000;
     const GUARD = '__dshAcBootRuntimeV4';
-    const REPLAY_ON_FOCUS = false;
+    // The opening sequence belongs to one application launch, not to every
+    // page surface that mounts later. The flag lives in sessionStorage: it
+    // survives a reload / wake-driven repaint of the same window session but
+    // disappears when the app is actually quit, so a fresh launch plays again.
+    // The Host-side splash guard reads the same key before the first paint.
+    const BOOT_FLAG_KEY = 'acb-boot-played';
     // A fresh id per plugin-module evaluation. If the same window evaluates a
     // newer client module (plugin-manager/hot refresh), the next BootHost mount
     // sees a different id and replays the sequence without a full app restart.
@@ -212,13 +219,29 @@ window.__ModuleLoader__.load({
         window[GUARD] = {
           hasPlayed: false,
           running: false,
-          hiddenSince: 0,
           lastFinishedAt: 0,
-          lastBlurAt: 0,
           lastStartedAt: 0,
         };
       }
       return window[GUARD];
+    }
+
+    function bootAlreadyPlayed() {
+      try {
+        return window.sessionStorage.getItem(BOOT_FLAG_KEY) === '1';
+      } catch (error) {
+        // Storage can be unavailable (locked-down browser modes). The run then
+        // plays once per page load instead of sticking forever.
+        return false;
+      }
+    }
+
+    function markBootPlayed() {
+      try {
+        window.sessionStorage.setItem(BOOT_FLAG_KEY, '1');
+      } catch (error) {
+        /* the once-per-launch guard degrades to once-per-page-load */
+      }
     }
 
     function removeBootSplash() {
@@ -2168,6 +2191,9 @@ window.__ModuleLoader__.load({
       const [workspaces, setWorkspaces] = useState(function () {
         return readAcbWorkspaces();
       });
+      // Decided once per page load; the visibility handler must not replay a
+      // run that already belongs to this launch.
+      const bootAllowedRef = useRef(false);
 
       const start = useCallback(() => {
         const rt = runtime();
@@ -2175,6 +2201,7 @@ window.__ModuleLoader__.load({
         rt.running = true;
         rt.hasPlayed = true;
         rt.lastStartedAt = Date.now();
+        markBootPlayed();
         setRunId((value) => value + 1);
       }, []);
 
@@ -2237,41 +2264,41 @@ window.__ModuleLoader__.load({
         // leaving the page stuck without its overlay.
         const interrupted = rt.hasPlayed && rt.lastStartedAt > 0 && rt.lastFinishedAt === 0;
         rt.running = false;
-        if (!document.hidden && (!rt.hasPlayed || interrupted || ACB_HOT_RELOAD)) start();
+
+        // The opening sequence belongs to the application launch, not to every
+        // surface that mounts afterwards. A window restored from the tray or a
+        // page woken from sleep reloads the same window session, where the
+        // sessionStorage flag is already set, so the sequence is not replayed.
+        // Waking the machine without a reload does not remount this component
+        // at all — and the listeners below no longer restart a finished run.
+        // A plugin hot refresh is the one explicit preview replay.
+        const played = bootAlreadyPlayed();
+        const allowed = ACB_HOT_RELOAD || !played || interrupted;
+        bootAllowedRef.current = allowed;
+
+        if (!allowed) {
+          // The Host injects its pre-boot splash into every page; a page that
+          // will not play the sequence must not keep the splash on screen.
+          removeBootSplash();
+        } else if (!document.hidden) {
+          start();
+        }
 
         const onVisibility = () => {
+          if (document.hidden) return;
           const state = runtime();
-          if (document.hidden) {
-            state.hiddenSince = Date.now();
-            return;
-          }
-          const wasHidden = state.hiddenSince > 0;
-          state.hiddenSince = 0;
           if (state.running) return;
-          if (wasHidden && Date.now() - state.lastFinishedAt > 650) {
-            start();
-          } else if (!state.hasPlayed || (state.lastStartedAt > 0 && state.lastFinishedAt === 0)) {
-            start();
-          }
+          const waiting =
+            !state.hasPlayed || (state.lastStartedAt > 0 && state.lastFinishedAt === 0);
+          // Only the first visible moment of a launch that has not shown its
+          // sequence yet (the app can start hidden to the tray) may begin
+          // here. A finished run stays finished for the whole session.
+          if (bootAllowedRef.current && waiting) start();
         };
 
-        const onBlur = () => {
-          runtime().lastBlurAt = Date.now();
-        };
-
-        const onFocus = () => {
-          if (!REPLAY_ON_FOCUS) return;
-          const state = runtime();
-          if (state.running || !state.hasPlayed) return;
-          if (state.lastBlurAt > 0 && Date.now() - state.lastBlurAt > 1200) start();
-        };
         document.addEventListener('visibilitychange', onVisibility);
-        window.addEventListener('blur', onBlur);
-        window.addEventListener('focus', onFocus);
         return () => {
           document.removeEventListener('visibilitychange', onVisibility);
-          window.removeEventListener('blur', onBlur);
-          window.removeEventListener('focus', onFocus);
         };
       }, [start]);
 
@@ -2304,27 +2331,6 @@ window.__ModuleLoader__.load({
           } catch (error) {
             /* ignore */
           }
-        };
-      }, [start]);
-
-      useEffect(() => {
-        let raf = 0;
-        let alive = true;
-        let last = performance.now();
-        const tick = function (timestamp) {
-          if (!alive) return;
-          const gap = timestamp - last;
-          last = timestamp;
-          if (gap > 1200) {
-            const state = runtime();
-            if (!state.running) start();
-          }
-          raf = requestAnimationFrame(tick);
-        };
-        raf = requestAnimationFrame(tick);
-        return () => {
-          alive = false;
-          cancelAnimationFrame(raf);
         };
       }, [start]);
 

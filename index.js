@@ -16,6 +16,23 @@
  */
 import { EARLY_CSS, EARLY_HTML } from './boot-splash.js';
 
+/**
+ * True once this window session already ran the opening sequence.
+ *
+ * The client half writes `acb-boot-played` into sessionStorage when the boot
+ * run starts. The marker survives a reload of the same window session (tray
+ * restore, wake from sleep, manual refresh) but is gone after a real app
+ * restart, so the splash only covers a genuine launch. This guard runs inline
+ * while the index parses, before the first paint, so a page that will not play
+ * the sequence never flashes the splash.
+ */
+const EARLY_GUARD =
+  'try{' +
+  'if(window.sessionStorage&&sessionStorage.getItem("acb-boot-played")==="1"){' +
+  'var n=document.querySelector("[data-acb-boot-splash]");if(n)n.remove();' +
+  '}' +
+  '}catch(error){}';
+
 function workspaceSnapshot(ctx) {
   try {
     const registry =
@@ -47,6 +64,10 @@ export function apply(ctx) {
     try {
       table.push({ kind: 'html', placement: 'body', html: EARLY_HTML });
       table.push({ kind: 'style', text: EARLY_CSS });
+      // Runs after the splash markup above and before the first paint. A page
+      // reload inside an already-started window session drops the splash
+      // instead of showing it again; a real launch leaves it in place.
+      table.push({ kind: 'script', placement: 'body', text: EARLY_GUARD });
       const rows = workspaceSnapshot(ctx);
       if (rows && rows.length > 0) {
         const json = JSON.stringify(rows)
