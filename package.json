@@ -1,6 +1,6 @@
 {
   "name": "@local/dsh-ac-boot",
-  "version": "0.12.0",
+  "version": "0.13.0",
   "private": true,
   "type": "module",
   "repository": {
@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://github.com/MosesMuxiXie/dsh-ac-boot/issues"
   },
-  "description": "A deep-space cinematic tactical-briefing boot sequence for the DeepSeek Harness Web UI. v12 makes the run launch-scoped: it plays when the application starts and never replays on wake from sleep, tray restore or a page reload (a sessionStorage launch flag also lets the Host drop the pre-boot splash before first paint on those reloads). v11 raises the map's dark/light contrast: darker relief land, a nonlinear session heat scale making low-occupancy regions nearly black and high-occupancy regions bright cyan, with the primary workspace in magenta; multi-node rays and links still light the network before the territory fills. The client module now carries a build fingerprint: a hot module reload (DSH plugin refresh / Unlag reload) replays the sequence in the same window without a full app restart; Ctrl+Alt+Shift+B or window.__ACB_REPLAY replays manually. The right information columns are gone; the map is full-bleed with the left intel column floating over it; the reveal is a white-hot flash, wide bloom, anamorphic streak and bright coastline after a 45°-to-top-down move. v8 supplies the live Host workspace snapshot and /acb/workspaces route; v7-v6 the deep tonal hierarchy, spatial field and light rig; plus the holographic logo uplink, briefing console, operator login and title HUD.",
+  "description": "A cinematic four-beat opening sequence for the DeepSeek Harness Web UI, painted with Agnes key art in an aerial-combat briefing style. v0.13.0 rebuilds the animation around four original generated backdrops (mission table, carrier launch, storm climb, sunset title), serves them from the Host under /acb/assets, and fixes the v0.12 startup incompatibility: the Host half now declares its webServer dependency, never touches the workspace registry, and contributes only the pre-boot splash plus a tiny read-only asset route. The launch-scoped one-shot behaviour from 0.12.0 is preserved (wake from sleep, tray restore and page reload never replay the sequence).",
   "exports": {
     ".": "./index.js",
     "./client": "./client.js",
@@ -22,6 +22,7 @@
     "index.js",
     "boot-splash.js",
     "client.js",
+    "assets/*.jpg",
     "cordis.patch.yml",
     "locale/*.json",
     "icon.svg",

@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title": "Tactical Briefing Boot",
-    "description": "A deep-space cinematic tactical-briefing boot sequence with a holographic logo uplink and an Ace-Combat-style multi-panel intelligence console: TGT INFO, MISSION DATA, OPERATION INFO, CONTACT ZONE, SAT INFORMATION, SIGHTING DATA, LOGIN INFORMATION, a perspective 3D tactical map, wireframe globe, target lock, near-black levels, ice/cyan key light, ember rim light and film grain. Four phases: logo, boot briefing, operator login, tactical title. MISSION START is removed. About 15 seconds, skippable."
+    "title": "Ace Combat Boot Sequence",
+    "description": "A four-beat aerial-combat opening painted with Agnes key art: mission-table briefing, carrier-deck launch, storm climb, and a sunset title above the clouds. The HUD is drawn in code; the launch is scoped to one application start and never replays on wake from sleep, tray restore or a page reload. About 15 seconds, skippable."
   }
 }

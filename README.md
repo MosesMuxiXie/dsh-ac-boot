@@ -1,28 +1,61 @@
-# 战术简报开机序列 · DSH Tactical Briefing Boot
+# 皇牌空战式开机序列 · DSH Ace Combat Boot
 
-DeepSeek Harness Web UI 的电影感开机序列，受战术任务简报界面启发：星场 + 全息上行、全幅工作区剧场地图、操作员登录、星球地平线标题。默认约 15 秒，四段自动衔接，结束淡入工作区。
+DeepSeek Harness Web UI 的电影感开机序列：四段式空战任务开场，画面由 **Agnes 生成的四张原始键 art** 构成——作战会议桌、航母甲板放飞、雷暴爬升、云海日落大标题。默认约 15 秒，四段自动衔接，结束淡入工作区。
 
-序列只属于**一次应用启动**：冷启动播放一次，休眠唤醒、托盘恢复、页面刷新都不会重播。
+序列只属于**一次应用启动**：冷启动播放一次；休眠唤醒、托盘恢复、页面刷新都不会重播。
 
-当前版本：**0.12.0**
+当前版本：**0.13.0**
 
-![工作区剧场地图（组件静态预览，示例数据）](docs/workspace-map.png)
+| 简报 | 起飞 |
+| --- | --- |
+| ![作战会议](docs/boot-brief.jpg) | ![甲板放飞](docs/boot-launch.jpg) |
+| **爬升** | **标题** |
+| ![雷暴爬升](docs/boot-ascent.jpg) | ![云海日落](docs/boot-title.jpg) |
 
 ## 这版是什么
 
-- **Logo**：星空、全息地球环、`DEEPSEEK / HARNESS` 上行，带战术 HUD 与运行进度。
-- **Boot**：全幅工作区剧场地图。45° 倾斜转俯视，白热 flash + 宽 bloom + 横向 streak，随后多点节点 rays/连线依次点亮，最后加载区域局势。
-- **Login**：深色全息操作员登录卡叠加在地图上；琥珀警示条、扫描线、凭据与访问校验。
-- **Title**：近黑星球地平线大标题，冰青主光 + 琥珀地平线，恢复剩余的战术 HUD。
+四段 Beats，全部 16:9 全幅铺满，HUD 由代码绘制、画面由 Agnes 绘制：
 
-地图不是静态装饰：Host 端读取真实的 `workspaceRegistry`，按每个工作区的 `sessionIds` 数量生成 Voronoi 区域。
+1. **简报 / BRIEF**：全息作战会议桌在暗场里缓慢漂移；左边一枚原创菱形翼徽章，右边 `DEEPSEEK / HARNESS` 字标划开，`OPERATION // FIRST LIGHT` 与指挥链路进度条逐步建立。
+2. **放飞 / LAUNCH**：航母甲板，弹射器蒸汽与琥珀跑道灯；锁定框压住机头，白字盖章 `LAUNCH CLEARANCE`，`PROFILE READ → SERVICES START → WORKSPACE INDEX → DISPLAY SYNC` 逐行点亮。
+3. **爬升 / ASCENT**：雷暴云层中的加力爬升，镜头轻震；左侧 `OPERATOR ACCESS` 卡片逐条校验身份、凭据与本机配置，右侧雷达开始扫描，`ACCESS GRANTED` 盖章。
+4. **标题 / TITLE**：云海日落，战机拖着两条尾迹飞向太阳；大标题、三枚状态 chip、`按 Enter 继续` 与自动继续进度条，任务完成 HUD。
 
-- 会话最多的工作区：**品红主区**；
-- 其他活跃工作区：**青色区域**，会话越多越亮；
-- 0/低会话区域：接近深黑蓝；
-- 每个区域带工作区标题、`WS-xx` 与会话数；右下角是 `PRIMARY / ACTIVE / IDLE` 图例；
-- 地形层使用程序化 hillshade，海面有细网格、海岸 shelf 与发光海岸线，内部不画路线/等高线等硬线；
-- 右侧信息列已删除；地图全幅铺满内容区，左侧 `TGT / MISSION / OPERATION` 变成悬浮 HUD。
+画面是原创生成图，不含任何游戏截图、字体、音频、标志或商标；"皇牌空战风格"指空战任务简报的构图与 HUD 语汇，不是对具体作品的复制。
+
+## 画面资产（Agnes）
+
+四张背景由 Agnes 图像模型 `agnes-image-2.5-flash` 生成，提示词只描述原创空战场景（虚构战机、原始构图、无标志无文字），成品转为 JPEG 放在 `assets/`：
+
+| 文件 | 场景 |
+| --- | --- |
+| `assets/briefing.jpg` | 俯视全息作战桌，发光线路线与航点 |
+| `assets/deck.jpg` | 黎明航母甲板，弹射蒸汽与琥珀灯光 |
+| `assets/ascent.jpg` | 雷暴云层中的加力爬升 |
+| `assets/horizon.jpg` | 云海日落与双尾迹战机 |
+
+Host 半侧把它们挂在 `/acb/assets/<name>.jpg` 下只读输出；客户端按 `?v=<ART_VERSION>` 取图并预加载。换图时把 `client.js` 里的 `ART_VERSION` 加一，再刷新插件即可，不需要重启 Host。
+
+## v0.13.0：启动兼容性修复
+
+v0.12.0 之后 DSH 出现过一次启动失败（`Host startup exceeded 60 seconds`），启动日志里 ac-boot 留下了这条报错：
+
+```
+[ac-boot] workspace data route was not registered
+Error: cannot get property "webServer" without inject
+```
+
+原因是 Host 半侧在没有声明 `inject` 的情况下读取了 `webServer` / `workspaceRegistry`。旧版还因此在每次启动时抛错；地图数据实际上从未取到真实工作区，一直用的是内置示例。
+
+v0.13.0 的 Host 半侧被收窄到最小：
+
+- 显式导出 `name` 与 `inject = ['webServer']`，不再读取 `workspaceRegistry`；
+- 不注册 `/acb/workspaces`，不做任何工作区快照；
+- 注入表只保留首帧 splash 的 `html` + `style` 两行（不再新增 `script` 行）；
+- 唯一新增的常驻内容是 `/acb/assets/` 只读静态路由；
+- 所有回调都包在 `try/catch` 里，激活阶段没有 await、没有网络请求、没有同步重活。
+
+也就是说，这个插件现在**没有能力拖慢或打断 Host 启动**；最坏情况只是图片路由缺失，客户端退回深色渐变背景。
 
 ## 安装
 
@@ -59,7 +92,7 @@ ln -s "$HOME/src/dsh-ac-boot" "$profileRoot/node_modules/@local/dsh-ac-boot"
 
 ### 2. 启用插件
 
-在 DSH 的「设置 → 插件」里启用 **开机序列 · 启动动画**。如果插件没有自动出现在列表中，把仓库根目录的 `cordis.patch.yml` 合并到 profile 的 `cordis.patch.yml`：
+在 DSH 的「设置 → 插件」里启用 **开机序列 · 启动动画**（此前被临时禁用的，在这里重新打开）。如果插件没有自动出现在列表中，把仓库根目录的 `cordis.patch.yml` 合并到 profile 的 `cordis.patch.yml`：
 
 ```yaml
 - insert:
@@ -75,10 +108,9 @@ ln -s "$HOME/src/dsh-ac-boot" "$profileRoot/node_modules/@local/dsh-ac-boot"
 
 ### 3. 重启边界
 
-- **首次安装**：需要完整退出 DSH（托盘 → 退出，或应用菜单退出）再启动一次。桌面端会在 Host 进程启动时缓存 `webserver/index-inject` 的注入结果，因此首帧 splash 和 `/acb/workspaces` 这类 Host 侧内容必须等一次应用级重启。
-- **之后的客户端更新**（地图、动画、CSS、区域、光照、启动去重）：可以直接用 DSH 的**插件刷新 / Unlag 刷新**重载客户端，不必完整退出应用。见下面的「热加载」。
-- **页面普通刷新**：不保证能拿到新的客户端模块——桌面端可能复用启动时的模块图。优先用插件刷新。
-- **v12 的 splash 前置 guard**：`index.js` 新增一段内联脚本，在首绘前按启动标记移除 splash；它属于 Host 注入，同样需要一次应用级重启才会随新注入生效。客户端去重本身改在 `client.js`，插件刷新即可先生效。
+- **首次安装 / 重新启用**：需要完整退出 DSH（托盘 → 退出，或应用菜单退出）再启动一次。桌面端会在 Host 进程启动时缓存 `webserver/index-inject` 的注入结果，因此首帧 splash 和 `/acb/assets` 这类 Host 侧内容必须等一次应用级重启。
+- **之后的客户端更新**（画面、HUD、文案、时序）：可以用 DSH 的**插件刷新 / Unlag 刷新**重载客户端，不必完整退出应用。见下面的「热加载」。
+- **换背景图**：更新 `assets/*.jpg`，把 `client.js` 的 `ART_VERSION` 加一，再刷新插件；图片路由每次请求都读磁盘，不需要重启 Host。
 
 ## 启动行为
 
@@ -86,7 +118,7 @@ ln -s "$HOME/src/dsh-ac-boot" "$profileRoot/node_modules/@local/dsh-ac-boot"
 
 - 冷启动 DSH（完全退出后重新启动）播放一次；
 - 休眠 / 睡眠唤醒、锁屏恢复、托盘窗口重新打开、同一窗口内页面重载都不会自动重播；
-- 播放开始时客户端往 `sessionStorage` 写入 `acb-boot-played` 标记。同一窗口会话内再加载页面时，客户端直接跳过序列；Host 注入的首帧 splash 也会在首绘前移除，不会闪一下；
+- 播放开始时客户端往 `sessionStorage` 写入 `acb-boot-played` 标记。同一窗口会话内再加载页面时，客户端直接跳过序列并移除 Host 注入的 splash；
 - 手动重播始终可用：`Ctrl+Alt+Shift+B` 或控制台 `window.__ACB_REPLAY()`；同一窗口内插件模块热替换（HMR）仍会自动重播一次，方便预览；
 - 想再看一次冷启动效果：把 DSH 完全退出（托盘 → 退出）再启动。
 
@@ -107,62 +139,57 @@ ln -s "$HOME/src/dsh-ac-boot" "$profileRoot/node_modules/@local/dsh-ac-boot"
 
 推荐工作流：
 
-1. 修改 `client.js` / 地图 / CSS；
+1. 修改 `client.js` / HUD / 画面文案；
 2. 在 DSH 里触发插件刷新（Unlag / 插件管理器重载）；
 3. 如果新模块是同一窗口热替换，会自动重播；整页重载则按上面的快捷键手动预览。
 
-只有改 Host 半侧（`index.js`、`boot-splash.js`、splash 注入、`/acb/workspaces` 路由）才需要应用级重启。
-
-## 地图数据
-
-Host 通过 `workspaceRegistry.list()` 生成快照：
-
-- 注入 `window.__ACB_WORKSPACES` 供首帧使用；
-- 注册 `GET /acb/workspaces` 返回实时 JSON（`{ list: [{ title, path, sessions, updatedAt }] }`）。
-
-客户端优先拉实时接口，失败时用启动快照，再失败才用占位工作区。因此换工作区 / 增删会话不需要重启动画；刷新一次开场即可读到最新数据。
-
-最多展示 8 个工作区；更多会折叠为 `OTHER WORKSPACES`。
+只有改 Host 半侧（`index.js`、`boot-splash.js`、`/acb/assets` 路由、splash 注入）才需要应用级重启。
 
 ## 文件
 
 | 文件 | 说明 |
 | --- | --- |
-| `index.js` | Host 半侧：注入首帧 splash、splash 去重 guard、启动快照、`/acb/workspaces` 路由 |
+| `index.js` | Host 半侧：首帧 splash 注入、`/acb/assets/` 只读图库路由；`inject = ['webServer']` |
 | `boot-splash.js` | 首帧 splash 的 HTML/CSS，无脚本、8 秒淡出兜底 |
-| `client.js` | 四段开机序列、全幅地图、多节点 rays、地形、启动去重、热重播、i18n、跳过与减少动态 |
+| `client.js` | 四段空战开场、HUD、Agnes 背景、启动去重、热重播、i18n、跳过与减少动态 |
+| `assets/*.jpg` | Agnes 生成的四张 16:9 背景（约 590 KB） |
 | `cordis.patch.yml` | bundle 插入 `ac-boot` 插件行 |
 | `locale/*.json` | 插件管理页标题与描述 |
 | `icon.svg` | 插件图标 |
-| `docs/workspace-map.png` | 地图组件静态预览（示例工作区数据） |
+| `docs/boot-*.jpg` | 四段画面预览 |
+| `docs/agnes-prompts.md` | 四张背景的原始 Agnes 提示词与请求参数 |
+| `scripts/agnes-gen.mjs` | Agnes 生图辅助脚本（开发用，从 `AGNES_API_KEY` 读 Key） |
 
 ## 调参
 
 - 总时长：`client.js` 顶部 `DURATION_MS`（默认 `15000`）
-- 四段切换：`PHASES`（默认 `0 / 2400 / 5700 / 9000 ms`）
+- 四段切换：`PHASES`（默认 `0 / 2600 / 6200 / 9800 ms`）
 - 减少动态效果时长：`REDUCED_MS`（默认 `5200`）
 - 淡入淡出：`FADE_MS`（默认 `800`）
 - 覆盖层级：`ORDER`（默认 `9000`）
-- 首帧 splash 自动淡出：`boot-splash.js` 的 `8s`
-- 地图区域数、锚点、配色：`client.js` 中 `WORKSPACE_MAP_ANCHORS` 与 `WorkspaceMap`
-- 区域热度曲线：`heat = Math.pow(ratio, 1.12)`，以及 `fillOpacity` / 径向光晕
-- 多点 rays / 连线：`nodeBursts`、`relayBursts`、`networkLinks`
-- 启动去重标记：`sessionStorage['acb-boot-played']`（`client.js` 与 `index.js` 的前置 guard 共用；清掉它可让下一次页面重载重新播放）
+- 背景图版本：`ART_VERSION`（默认 `13`，换图时 +1）
+- 启动去重标记：`sessionStorage['acb-boot-played']`（客户端与 splash 去重共用；清掉它可让下一次页面重载重新播放）
 
 ## 交互
 
 - 点击任意处 / `Esc` / `Enter` / `Space` 跳过；
 - 动画中隐藏窗口，回来会继续，不会从头重播；
 - 播放结束后隐藏 / 重新打开窗口、休眠唤醒都不会重播；需要重看用上面的手动重播；
-- `prefers-reduced-motion` 下显示约 5 秒的静态版，保留信息、去掉位移与强光；
-- 地图覆盖层使用 `shell.overlay` 槽位，遮住桌面宠物等底层元素。
+- `prefers-reduced-motion` 下使用较短时序的静态版，保留信息、去掉位移与强光；
+- 覆盖层使用 `shell.overlay` 槽位，遮住桌面宠物等底层元素。
 
 ## 设计说明
 
-- 视觉语言参考战术简报/空战 HUD 的构图与信息密度，**代码、地图轮廓、图标全部为原创实现，不含任何游戏素材、字体或音频**。
-- 地图是虚构剧场大陆，不是现实世界地图，也不是任何游戏地图的复制。
-- 动画只对 `transform` / `opacity` / `clip-path` 等合成属性做过渡；React 只切换阶段。
-- 已知限制：DSH 桌面端缓存 Host 注入是平台行为，无法从插件侧绕过；因此 splash 和 Host 路由的更新始终需要一次应用级重启。
+- 视觉语言参考空战任务简报/游戏 HUD 的构图与信息密度，**代码、HUD、图标全部原创，背景图由 Agnes 依据原创提示词生成，不含任何游戏素材、字体、音频、商标或真实机徽**。
+- 四段动画只对 `transform` / `opacity` / `clip-path` 等合成属性做过渡；React 只切换阶段，不写逐帧样式。
+- 背景图是 1312×736 JPEG，按 `cover` 铺满；大屏上依赖暗角、扫描线与颗粒遮瑕，属于电影感的静态底图而不是 4K 素材。
+- 已知限制：DSH 桌面端缓存 Host 注入是平台行为，无法从插件侧绕过；因此 splash 和 `/acb/assets` 路由的更新始终需要一次应用级重启。
+
+## 生成记录
+
+- 图像模型：Agnes `agnes-image-2.5-flash`，尺寸 1280×720（上游返回 1312×736），seed 未固定，四张各一次成功生成。
+- 提示词只描述原创场景，例如“劫持航母甲板黎明放飞”（对应 `deck.jpg`）、“云海日落双尾迹战机”（对应 `horizon.jpg`），并明确要求 no text / no logos / no insignia / no real-world aircraft markings。
+- 成品压缩为 JPEG（quality 90），合计约 590 KB，随仓库分发。
 
 ## License
 

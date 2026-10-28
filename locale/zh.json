@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title": "战术简报 · 开机序列",
-    "description": "深空电影感游戏式开机序列：全息 DEEPSEEK 上行揭幕 + 《皇牌空战》式多面板战术简报情报台（TGT INFO、MISSION DATA、OPERATION INFO、CONTACT ZONE、SAT INFORMATION、SIGHTING DATA、LOGIN INFORMATION）、倾斜 3D 战术地图、线框地球与目标锁定；近黑底色、冰青主光、琥珀轮廓光与胶片颗粒。四个阶段：Logo、启动简报、操作员登录、战术标题。MISSION START 已删除。约 15 秒，可跳过。"
+    "title": "开机序列 · 启动动画",
+    "description": "皇牌空战式四段开机序列，画面由 Agnes 生成：作战会议简报 → 航母甲板放飞 → 雷暴爬升 → 云海日落大标题；HUD 由代码绘制，冰青与琥珀双色、胶片颗粒、锁定框、雷达与任务章。约 15 秒，可跳过；只在应用启动时播放一次，休眠唤醒 / 托盘恢复 / 页面刷新不会重播。"
   }
 }
