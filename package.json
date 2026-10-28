@@ -1,6 +1,6 @@
 {
   "name": "@local/dsh-ac-boot",
-  "version": "0.16.0",
+  "version": "0.17.0",
   "private": true,
   "type": "module",
   "repository": {
@@ -11,7 +11,7 @@
   "bugs": {
     "url": "https://github.com/MosesMuxiXie/dsh-ac-boot/issues"
   },
-  "description": "A holographic mission-briefing opening sequence for the DeepSeek Harness Web UI. v0.16.0 choreographs the theater reveal: the map starts uncolored, a white-hot seed appears and rises while dense layered rays burst out of it, the highlighted sector fill rises from below, then the halo dissipates and leaves only the key data nodes. Procedural coastlines, latitude/longitude graticule and satellite/plate data rails complete the in-world briefing interface. The map is drawn entirely in SVG; Agnes supplies only the terrain relief and holographic table textures. Host contract unchanged (name + inject=['webServer'], splash rows only, read-only /acb/assets). Launch-scoped one-shot behaviour preserved.",
+  "description": "A holographic mission-briefing opening sequence for the DeepSeek Harness Web UI. v0.17.0 choreographs the theater reveal: the map starts uncolored, a solid white-hot seed appears and rises, bursting a denser (240/200/96-ray) fan that fades quickly, the highlighted sector fill rises from below, and the bright point lingers solid before gradually dissipating, leaving only the key nodes. Procedural coastlines, lat/long graticule and satellite/plate rails complete the interface. The map is drawn entirely in SVG; Agnes supplies only the terrain relief and holographic table textures. Host contract unchanged (name + inject=['webServer'], splash rows only, read-only /acb/assets). Launch-scoped one-shot behaviour preserved.",
   "exports": {
     ".": "./index.js",
     "./client": "./client.js",

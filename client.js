@@ -78,7 +78,7 @@ window.__ModuleLoader__.load({
       'aria.skip': '跳过开机动画',
       'skip.label': '跳过',
       'hud.op': '行动 // 第一缕光',
-      'hud.build': '版本 16.0 // 本地',
+      'hud.build': '版本 17.0 // 本地',
       'hud.theater': '本地战区 // 06',
       'hud.link': '链路安全',
       'brief.kicker': '战术简报 // 本地战区',
@@ -127,7 +127,7 @@ window.__ModuleLoader__.load({
       'aria.skip': 'Skip the boot sequence',
       'skip.label': 'SKIP',
       'hud.op': 'OPERATION // FIRST LIGHT',
-      'hud.build': 'BUILD 16.0 // LOCAL',
+      'hud.build': 'BUILD 17.0 // LOCAL',
       'hud.theater': 'LOCAL THEATER // 06',
       'hud.link': 'LINK SECURE',
       'brief.kicker': 'TACTICAL BRIEFING // LOCAL THEATER',
@@ -414,7 +414,7 @@ window.__ModuleLoader__.load({
       graticule.push(h('line', { key: 'axis-x', className: 'axis', x1: 0, y1: 450, x2: 1600, y2: 450 }));
       graticule.push(h('line', { key: 'axis-y', className: 'axis', x1: 800, y1: 0, x2: 800, y2: 900 }));
       const nodes = NODES.map(function (node, index) {
-        const count = node.hub ? 120 : 56;
+        const count = node.hub ? 200 : 96;
         const rays = [];
         for (let ray = 0; ray < count; ray += 1) {
           const angle = (ray / count) * Math.PI * 2 + index * 0.37;
@@ -460,7 +460,7 @@ window.__ModuleLoader__.load({
           h('circle', { className: 'acb-node-halo acb-node-halo-core', r: node.hub ? 34 : 22, fill: 'url(#acbNodeCore)' }),
           h('g', { className: 'acb-node-rays' }, rays),
           h('circle', { className: 'acb-node-ring', r: node.hub ? 9 : 5.5 }),
-          h('circle', { className: 'acb-node-dot', r: node.hub ? 3.4 : 2.2 }),
+          h('circle', { className: 'acb-node-dot', r: node.hub ? 6.2 : 2.4 }),
           node.hub
             ? h('text', { className: 'acb-node-tag', x: 14, y: -10 }, node.tag)
             : null,
@@ -470,10 +470,10 @@ window.__ModuleLoader__.load({
         );
       });
       const seedRays = [];
-      for (let ray = 0; ray < 96; ray += 1) {
-        const angle = (ray / 96) * Math.PI * 2 + 0.17;
-        const long = ray % 6 === 0;
-        const length = long ? 300 + ((ray * 47) % 280) : 44 + ((ray * 61) % 210);
+      for (let ray = 0; ray < 240; ray += 1) {
+        const angle = (ray / 240) * Math.PI * 2 + 0.17;
+        const long = ray % 8 === 0;
+        const length = long ? 320 + ((ray * 47) % 300) : 40 + ((ray * 61) % 240);
         seedRays.push(
           h('line', {
             key: 'seed-ray-' + ray,
@@ -493,10 +493,12 @@ window.__ModuleLoader__.load({
           { className: 'acb-seed' },
           h('circle', { className: 'acb-seed-halo acb-seed-halo-far', r: 176, fill: 'url(#acbSeedGlow)' }),
           h('circle', { className: 'acb-seed-halo acb-seed-halo-mid', r: 82, fill: 'url(#acbSeedGlow)' }),
-          h('circle', { className: 'acb-seed-halo acb-seed-halo-near', r: 34, fill: 'url(#acbSeedCore)' }),
+          h('circle', { className: 'acb-seed-halo acb-seed-halo-near', r: 38, fill: 'url(#acbSeedCore)' }),
           h('circle', { className: 'acb-seed-ring', r: 18 }),
           h('g', { className: 'acb-seed-rays' }, seedRays),
-          h('circle', { className: 'acb-seed-core', r: 5 }),
+          h('circle', { className: 'acb-seed-flare', r: 24, fill: 'url(#acbSeedCore)' }),
+          h('circle', { className: 'acb-seed-core', r: 9 }),
+          h('circle', { className: 'acb-seed-core-inner', r: 4 }),
         ),
       );
       const cities = CITIES.map(function (city) {
@@ -545,8 +547,8 @@ window.__ModuleLoader__.load({
               h(
                 'radialGradient',
                 { id: 'acbNodeGlow' },
-                h('stop', { offset: '0%', stopColor: 'rgba(226,250,255,.95)' }),
-                h('stop', { offset: '38%', stopColor: 'rgba(150,230,255,.3)' }),
+                h('stop', { offset: '0%', stopColor: 'rgba(255,255,255,1)' }),
+                h('stop', { offset: '34%', stopColor: 'rgba(170,238,255,.4)' }),
                 h('stop', { offset: '100%', stopColor: 'rgba(30,90,120,0)' }),
               ),
               h(
@@ -559,16 +561,17 @@ window.__ModuleLoader__.load({
               h(
                 'radialGradient',
                 { id: 'acbSeedGlow' },
-                h('stop', { offset: '0%', stopColor: 'rgba(236,253,255,.95)' }),
-                h('stop', { offset: '26%', stopColor: 'rgba(150,232,255,.42)' }),
-                h('stop', { offset: '100%', stopColor: 'rgba(50,140,180,0)' }),
+                h('stop', { offset: '0%', stopColor: 'rgba(255,255,255,1)' }),
+                h('stop', { offset: '24%', stopColor: 'rgba(198,246,255,.58)' }),
+                h('stop', { offset: '100%', stopColor: 'rgba(60,150,190,0)' }),
               ),
               h(
                 'radialGradient',
                 { id: 'acbSeedCore' },
                 h('stop', { offset: '0%', stopColor: '#ffffff' }),
-                h('stop', { offset: '16%', stopColor: 'rgba(255,255,255,.95)' }),
-                h('stop', { offset: '38%', stopColor: 'rgba(190,242,255,.55)' }),
+                h('stop', { offset: '22%', stopColor: 'rgba(255,255,255,.99)' }),
+                h('stop', { offset: '44%', stopColor: 'rgba(224,251,255,.72)' }),
+                h('stop', { offset: '72%', stopColor: 'rgba(150,225,255,.22)' }),
                 h('stop', { offset: '100%', stopColor: 'rgba(120,220,255,0)' }),
               ),
               h(
@@ -1277,11 +1280,11 @@ window.__ModuleLoader__.load({
 .acb-highlight-glow{fill:url(#acbGlowMagenta);mix-blend-mode:screen;opacity:.68;}
 .acb-highlight-label{fill:rgba(255,170,205,.9);font-size:10px;letter-spacing:.24em;text-transform:uppercase;}
 .acb-rise-rect{transform-box:fill-box;transform-origin:50% 100%;transform:scaleY(1);}
-.acb-root[data-phase="theater"] .acb-rise-rect{animation:acbRegionRise 1.7s cubic-bezier(.2,.75,.2,1) 1.05s both;}
+.acb-root[data-phase="theater"] .acb-rise-rect{animation:acbRegionRise 1.6s cubic-bezier(.2,.75,.2,1) 1.3s both;}
 @keyframes acbRegionRise{from{transform:scaleY(0)}to{transform:scaleY(1)}}
 .acb-root[data-phase="theater"] .acb-highlight{animation:acbHighlightIn 1.1s ease .95s both;}
 @keyframes acbHighlightIn{from{opacity:0}to{opacity:1}}
-.acb-root[data-phase="theater"] .acb-highlight-glow{animation:acbHighlightBloom 4.9s ease 1s both;}
+.acb-root[data-phase="theater"] .acb-highlight-glow{animation:acbHighlightBloom 4.2s ease 1.3s both;}
 @keyframes acbHighlightBloom{0%{opacity:0}22%{opacity:1}62%{opacity:.8}100%{opacity:.5}}
 .acb-root[data-phase="theater"] .acb-highlight-label{animation:acbLabelIn .8s ease 2s both;}
 @keyframes acbLabelIn{from{opacity:0}to{opacity:1}}
@@ -1296,53 +1299,63 @@ window.__ModuleLoader__.load({
 .acb-node-rays line.hot{stroke:rgba(255,255,255,.66);stroke-width:1.15;}
 .acb-node-rays line.spike{stroke:rgba(255,255,255,.34);stroke-width:.9;}
 .acb-node-ring{fill:rgba(4,14,22,.5);stroke:rgba(190,246,255,.6);stroke-width:1;}
-.acb-node-dot{fill:#e8fdff;filter:drop-shadow(0 0 6px rgba(190,246,255,.95));}
+.acb-node-dot{fill:#e8fdff;filter:drop-shadow(0 0 6px #fff) drop-shadow(0 0 18px rgba(235,252,255,1)) drop-shadow(0 0 40px rgba(150,228,255,.8));}
+.acb-node.is-hub .acb-node-dot{filter:drop-shadow(0 0 8px #fff) drop-shadow(0 0 24px rgba(235,252,255,1)) drop-shadow(0 0 56px rgba(150,228,255,.9));}
 .acb-node-ring,.acb-node-dot{transform-box:fill-box;transform-origin:center;}
 .acb-node-halo{mix-blend-mode:screen;opacity:0;transform-box:fill-box;transform-origin:center;}
 .acb-node-halo-core{mix-blend-mode:screen;opacity:0;transform-box:fill-box;transform-origin:center;}
-.acb-node.is-hub .acb-node-halo{opacity:.5;}
-.acb-node.is-hub .acb-node-halo-core{opacity:.6;}
+.acb-node.is-hub .acb-node-halo{opacity:.66;}
+.acb-node.is-hub .acb-node-halo-core{opacity:.7;}
 .acb-node-label{fill:rgba(214,246,255,.85);font-size:8.5px;letter-spacing:.16em;}
 .acb-node-tag{fill:rgba(255,190,130,.68);font-size:7px;letter-spacing:.14em;}
 .acb-root[data-phase="brief"] .acb-node-label,
 .acb-root[data-phase="brief"] .acb-node-tag{opacity:0;}
 .acb-root[data-phase="theater"] .acb-node .acb-node-ring,
-.acb-root[data-phase="theater"] .acb-node .acb-node-dot{animation:acbNodeCoreIn .55s ease calc(1.35s + var(--acb-i) * .08s) both;}
+.acb-root[data-phase="theater"] .acb-node .acb-node-dot{animation:acbNodeCoreIn .55s ease calc(1.6s + var(--acb-i) * .08s) both;}
 @keyframes acbNodeCoreIn{from{opacity:0;transform:scale(.3)}to{opacity:1;transform:scale(1)}}
 .acb-root[data-phase="theater"] .acb-node .acb-node-halo,
-.acb-root[data-phase="theater"] .acb-node .acb-node-halo-core{animation:acbNodeHaloIn 3.2s ease calc(1.3s + var(--acb-i) * .07s) both;}
+.acb-root[data-phase="theater"] .acb-node .acb-node-halo-core{animation:acbNodeHaloIn 2.2s ease calc(1.45s + var(--acb-i) * .05s) both;}
 @keyframes acbNodeHaloIn{0%{opacity:0;transform:scale(.4)}22%{opacity:.95;transform:scale(1.1)}55%{opacity:.7;transform:scale(1)}100%{opacity:0;transform:scale(1.15)}}
-.acb-root[data-phase="theater"] .acb-node .acb-node-rays{animation:acbNodeRaysOut 3.1s ease calc(1.32s + var(--acb-i) * .06s) both;}
-@keyframes acbNodeRaysOut{0%{opacity:0;transform:scale(.05)}22%{opacity:.95;transform:scale(1)}60%{opacity:.7}100%{opacity:0;transform:scale(1.07)}}
+.acb-root[data-phase="theater"] .acb-node .acb-node-rays{animation:acbNodeRaysOut 1.7s ease calc(1.48s + var(--acb-i) * .05s) both;}
+@keyframes acbNodeRaysOut{0%{opacity:0;transform:scale(.05)}16%{opacity:1;transform:scale(1)}42%{opacity:.95;transform:scale(1.01)}100%{opacity:0;transform:scale(1.08)}}
 .acb-root[data-phase="theater"] .acb-node.is-hub .acb-node-halo{animation-name:acbNodeHaloHub;}
 @keyframes acbNodeHaloHub{0%{opacity:0;transform:scale(.4)}20%{opacity:1;transform:scale(1.12)}55%{opacity:.85;transform:scale(1)}100%{opacity:.5;transform:scale(1.05)}}
 .acb-root[data-phase="theater"] .acb-node.is-hub .acb-node-halo-core{animation-name:acbNodeHaloCoreHub;}
 @keyframes acbNodeHaloCoreHub{0%{opacity:0;transform:scale(.4)}20%{opacity:1;transform:scale(1.15)}45%{opacity:.9;transform:scale(1)}100%{opacity:.6;transform:scale(1.08)}}
 .acb-root[data-phase="theater"] .acb-node-label,
-.acb-root[data-phase="theater"] .acb-node-tag{animation:acbLabelIn .8s ease calc(2.15s + var(--acb-i) * .05s) both;}
+.acb-root[data-phase="theater"] .acb-node-tag{animation:acbLabelIn .8s ease calc(2.35s + var(--acb-i) * .05s) both;}
 .acb-seed-anchor{pointer-events:none;}
 .acb-seed{opacity:0;transform-box:fill-box;transform-origin:center;}
-.acb-root[data-phase="theater"] .acb-seed{animation:acbSeedRise 4s cubic-bezier(.2,.7,.25,1) .45s both;}
+.acb-root[data-phase="theater"] .acb-seed{animation:acbSeedRise 3.6s cubic-bezier(.2,.7,.25,1) .65s both;}
 @keyframes acbSeedRise{
-  0%{opacity:0;transform:translateY(34px) scale(.3)}
-  10%{opacity:1;transform:translateY(24px) scale(.75)}
-  22%{opacity:1;transform:translateY(10px) scale(1)}
-  32%{opacity:1;transform:translateY(0) scale(1.06)}
-  55%{opacity:1;transform:translateY(-5px) scale(1.03)}
-  72%{opacity:.55;transform:translateY(-12px) scale(1.2)}
-  100%{opacity:0;transform:translateY(-22px) scale(1.55)}
+  0%{opacity:0;transform:translateY(32px) scale(.3)}
+  8%{opacity:1;transform:translateY(22px) scale(.85)}
+  18%{opacity:1;transform:translateY(8px) scale(1.04)}
+  28%{opacity:1;transform:translateY(0) scale(1.08)}
+  45%{opacity:1;transform:translateY(-3px) scale(1.05)}
+  62%{opacity:1;transform:translateY(-5px) scale(1.08)}
+  80%{opacity:1;transform:translateY(-9px) scale(1.16)}
+  100%{opacity:0;transform:translateY(-26px) scale(1.7)}
 }
 .acb-seed-halo{mix-blend-mode:screen;}
-.acb-seed-halo-far{opacity:.55;}
-.acb-seed-halo-mid{opacity:.8;}
-.acb-seed-halo-near{opacity:.95;}
+.acb-root[data-phase="theater"] .acb-seed-halo-far{animation:acbSeedHaloFar 1.8s ease 1.45s both;}
+@keyframes acbSeedHaloFar{from{opacity:.7}to{opacity:0}}
+.acb-root[data-phase="theater"] .acb-seed-halo-mid{animation:acbSeedHaloMid 1.8s ease 1.4s both;}
+@keyframes acbSeedHaloMid{from{opacity:.92}to{opacity:0}}
+.acb-root[data-phase="theater"] .acb-seed-halo-near{animation:acbSeedHaloNear 1.7s ease 1.35s both;}
+@keyframes acbSeedHaloNear{from{opacity:1}to{opacity:0}}
+.acb-seed-halo-far{opacity:.7;}
+.acb-seed-halo-mid{opacity:.92;}
+.acb-seed-halo-near{opacity:1;}
 .acb-seed-ring{fill:none;stroke:rgba(255,255,255,.7);stroke-width:.8;stroke-dasharray:2 4;}
-.acb-seed-core{fill:#ffffff;filter:drop-shadow(0 0 8px #fff) drop-shadow(0 0 26px rgba(170,240,255,.95));}
+.acb-seed-flare{mix-blend-mode:screen;}
+.acb-seed-core{fill:#ffffff;filter:drop-shadow(0 0 5px #fff) drop-shadow(0 0 16px #fff) drop-shadow(0 0 48px rgba(220,250,255,1)) drop-shadow(0 0 96px rgba(150,228,255,.85));}
+.acb-seed-core-inner{fill:#ffffff;}
 .acb-seed-rays{opacity:0;transform-box:fill-box;transform-origin:center;}
-.acb-seed-rays line{stroke:rgba(200,245,255,.24);stroke-width:.7;}
-.acb-seed-rays line.hot{stroke:rgba(255,255,255,.58);stroke-width:1;}
-.acb-root[data-phase="theater"] .acb-seed-rays{animation:acbSeedRays 3.2s ease .5s both;}
-@keyframes acbSeedRays{0%{opacity:0;transform:scale(.1)}16%{opacity:1;transform:scale(1)}60%{opacity:.85;transform:scale(1.02)}100%{opacity:0;transform:scale(1.18)}}
+.acb-seed-rays line{stroke:rgba(208,248,255,.3);stroke-width:.65;}
+.acb-seed-rays line.hot{stroke:rgba(255,255,255,.7);stroke-width:1;}
+.acb-root[data-phase="theater"] .acb-seed-rays{animation:acbSeedRays 1.6s ease .7s both;}
+@keyframes acbSeedRays{0%{opacity:0;transform:scale(.08)}12%{opacity:1;transform:scale(1)}40%{opacity:1;transform:scale(1.02)}100%{opacity:0;transform:scale(1.16)}}
 .acb-rails{position:absolute;top:15vh;z-index:4;width:200px;font-size:7.5px;line-height:1.75;
   letter-spacing:.1em;color:rgba(176,230,250,.62);pointer-events:none;text-shadow:0 0 8px rgba(0,0,0,.9);line-height:1.9;}
 .acb-rails-left{left:24px;text-align:left;border-left:1px solid rgba(96,200,255,.24);padding-left:14px;}
