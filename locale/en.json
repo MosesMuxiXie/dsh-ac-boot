@@ -1,6 +1,6 @@
 {
   "meta": {
     "title": "Tactical Briefing Boot",
-    "description": "A four-beat holographic mission-briefing opening: holographic command-table uplink, full-bleed theater map (procedural coastlines, latitude/longitude graticule, satellite data rails, long-ray data-node bursts, a magenta highlighted sector, a mission subtitle line), operator access / systems check, and a mission-start title. The map and HUD are drawn in code; Agnes generates only the terrain relief and holographic table plates. About 15 seconds, skippable, played once per application start."
+    "description": "A four-beat holographic mission-briefing opening. The theater reveal starts uncolored: a white-hot seed rises and bursts into dense rays while the highlighted sector fill rises from below, then the halo dissipates leaving only the key data nodes. Holographic command-table uplink, operator access / systems check and a mission-start title complete the sequence. The map and HUD are drawn in code; Agnes generates only the terrain relief and holographic table plates. About 15 seconds, skippable, played once per application start."
   }
 }

@@ -6,11 +6,13 @@ DeepSeek Harness Web UI 的电影感开机序列：四段式**战术任务简报
 
 序列只属于**一次应用启动**：冷启动播放一次；休眠唤醒、托盘恢复、页面刷新都不会重播。
 
-当前版本：**0.15.1**
+当前版本：**0.16.0**
 
 > 0.15.0：战区段重做成完整的任务简报界面——程序化海岸线 + 经纬网格 + `SAT DATA LINK` / `PLATE` 数据栏 + 多节点长射线 + 品红 `LOCAL THEATER` 高亮 + 底部任务字幕。
 
 > 0.15.1：射线爆发加密——每个节点从密集的亮核向外分三层（细 / 中 / 长）散开，另加四向十字长射线，密度大幅提高。
+
+> 0.16.0：战区揭示动画按"初始无色 → 强光点浮起 → 密集射线爆发 → 下方区域自下而上涂色 → 光晕消散只留关键点"编排，并放大了光晕中心的浓度。
 
 | 简报上行 | 战区态势 |
 | --- | --- |
@@ -20,10 +22,10 @@ DeepSeek Harness Web UI 的电影感开机序列：四段式**战术任务简报
 
 ## 这一版是什么
 
-1. **简报 / BRIEF（0–2.8s）**：暗场里一张全息指挥桌缓慢呼吸，左侧轨道环，右侧 `DEEPSEEK / HARNESS` 字标划开；`OPERATION // FIRST LIGHT`、加密上行状态、简报准备进度，右侧 `BRIEFING DATA`（TGT / GRID / UPLINK / STATUS）。
-2. **战区 / THEATER（2.8–7.2s）**：全幅全息战区图。程序化海岸线 + 青色发光描边，经纬网格与坐标刻度；左右两列数据栏——`SAT DATA LINK / UPLOAD STATUS / NODE STATUS` 与 `PLATE 06 // LOCAL / THEATER GRID`；12 个数据节点从密集亮核向外分三层（细 / 中 / 长）散开，另有四向十字长射线，4 个主节点更亮；品红 `LOCAL THEATER` 高亮区、城市标签与底部双语任务字幕。
-3. **权限 / CONSOLE（7.2–10.8s）**：战区图退暗，左侧 `OPERATOR ACCESS` 卡片逐条校验身份、凭据、本机配置并盖 `ACCESS GRANTED`；右侧系统检查列表、雷达扫描与遥测；背景是低透明度的 `CLASSIFIED` 分类水印。
-4. **标题 / TITLE（10.8–15s）**：地图线稿淡出，`DEEPSEEK` 大标题、`MISSION START` 任务开始章、三枚状态 chip、`按 Enter 继续` 与自动继续进度。
+1. **简报 / BRIEF（0–2.6s）**：暗场里一张全息指挥桌缓慢呼吸，左侧轨道环，右侧 `DEEPSEEK / HARNESS` 字标划开；`OPERATION // FIRST LIGHT`、加密上行状态、简报准备进度，右侧 `BRIEFING DATA`（TGT / GRID / UPLINK / STATUS）。
+2. **战区 / THEATER（2.6–8.2s）**：全幅全息战区图，按揭示动画出现。初始只有无色的海岸线与网格；随后一个白热光点浮起、爆出密集射线，品红高亮区从下方升腾填色，光晕达到峰值后消散，只留下主节点与细小关键点。程序化海岸线 + 青色发光描边，经纬网格与坐标刻度；左右两列数据栏——`SAT DATA LINK / UPLOAD STATUS / NODE STATUS` 与 `PLATE 06 // LOCAL / THEATER GRID`；12 个数据节点从密集亮核向外分三层（细 / 中 / 长）散开，另有四向十字长射线，4 个主节点更亮；品红 `LOCAL THEATER` 高亮区、城市标签与底部双语任务字幕。
+3. **权限 / CONSOLE（8.2–11.4s）**：战区图退暗，左侧 `OPERATOR ACCESS` 卡片逐条校验身份、凭据、本机配置并盖 `ACCESS GRANTED`；右侧系统检查列表、雷达扫描与遥测；背景是低透明度的 `CLASSIFIED` 分类水印。
+4. **标题 / TITLE（11.4–15s）**：地图线稿淡出，`DEEPSEEK` 大标题、`MISSION START` 任务开始章、三枚状态 chip、`按 Enter 继续` 与自动继续进度。
 
 构图与信息密度参考空战任务简报界面（黑底全息地图、数据链侧栏、节点射线、底部字幕），但**地图形状、城市、数据与文案全部原创虚构**，不映射现实地理，也不读取真实工作区数据。
 
@@ -177,6 +179,7 @@ ln -s "$HOME/src/dsh-ac-boot" "$profileRoot/node_modules/@local/dsh-ac-boot"
 - 战区形状：`LANDS`（`blobPath()` 程序化海岸线，种子固定）；高亮区：`HIGHLIGHTS`；节点：`NODES`；城市：`CITIES`；经纬网格：`GRATICULE_X` / `GRATICULE_Y`
 - 数据栏文案：`SAT_ROWS` / `NODE_ROWS` / `PLATE_ROWS` / `GRID_ROWS`；底部字幕：`theater.caption` / `theater.caption.zh`
 - 地图倾角：`.acb-map-plane` 的四段 `rotateX`（简报 17° → 战区 5° → 权限 10° → 标题 12°）
+- 战区揭示：`acbSeedRise` / `acbSeedRays`（光点浮起与射线）、`acbRegionRise`（区域自下而上）、`acbNodeRaysOut`（节点射线消散）
 
 ## 交互
 
