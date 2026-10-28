@@ -1,0 +1,3 @@
+- insert:
+    - id: ac-boot
+      name: '@local/dsh-ac-boot'
