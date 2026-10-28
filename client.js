@@ -78,7 +78,7 @@ window.__ModuleLoader__.load({
       'aria.skip': '跳过开机动画',
       'skip.label': '跳过',
       'hud.op': '行动 // 第一缕光',
-      'hud.build': '版本 17.0 // 本地',
+      'hud.build': '版本 18.0 // 本地',
       'hud.theater': '本地战区 // 06',
       'hud.link': '链路安全',
       'brief.kicker': '战术简报 // 本地战区',
@@ -127,7 +127,7 @@ window.__ModuleLoader__.load({
       'aria.skip': 'Skip the boot sequence',
       'skip.label': 'SKIP',
       'hud.op': 'OPERATION // FIRST LIGHT',
-      'hud.build': 'BUILD 17.0 // LOCAL',
+      'hud.build': 'BUILD 18.0 // LOCAL',
       'hud.theater': 'LOCAL THEATER // 06',
       'hud.link': 'LINK SECURE',
       'brief.kicker': 'TACTICAL BRIEFING // LOCAL THEATER',
@@ -1256,7 +1256,7 @@ window.__ModuleLoader__.load({
 .acb-map{position:absolute;inset:0;z-index:1;pointer-events:none;
   transition:opacity .9s ease,filter .9s ease;}
 .acb-map-plane{position:absolute;inset:-9% -6%;transform-origin:50% 46%;
-  transition:transform 1.6s cubic-bezier(.2,.6,.2,1);
+  transition:transform .9s cubic-bezier(.2,.6,.2,1);
   transform:perspective(1700px) rotateX(7deg) scale(1.04);}
 .acb-map-svg{width:100%;height:100%;display:block;}
 .acb-root[data-phase="brief"] .acb-map{opacity:.34;filter:blur(1.2px) saturate(.95);}
@@ -1280,11 +1280,11 @@ window.__ModuleLoader__.load({
 .acb-highlight-glow{fill:url(#acbGlowMagenta);mix-blend-mode:screen;opacity:.68;}
 .acb-highlight-label{fill:rgba(255,170,205,.9);font-size:10px;letter-spacing:.24em;text-transform:uppercase;}
 .acb-rise-rect{transform-box:fill-box;transform-origin:50% 100%;transform:scaleY(1);}
-.acb-root[data-phase="theater"] .acb-rise-rect{animation:acbRegionRise 1.6s cubic-bezier(.2,.75,.2,1) 1.3s both;}
+.acb-root[data-phase="theater"] .acb-rise-rect{animation:acbRegionRise 1.6s cubic-bezier(.2,.75,.2,1) 1.55s both;}
 @keyframes acbRegionRise{from{transform:scaleY(0)}to{transform:scaleY(1)}}
 .acb-root[data-phase="theater"] .acb-highlight{animation:acbHighlightIn 1.1s ease .95s both;}
 @keyframes acbHighlightIn{from{opacity:0}to{opacity:1}}
-.acb-root[data-phase="theater"] .acb-highlight-glow{animation:acbHighlightBloom 4.2s ease 1.3s both;}
+.acb-root[data-phase="theater"] .acb-highlight-glow{animation:acbHighlightBloom 4.2s ease 1.55s both;}
 @keyframes acbHighlightBloom{0%{opacity:0}22%{opacity:1}62%{opacity:.8}100%{opacity:.5}}
 .acb-root[data-phase="theater"] .acb-highlight-label{animation:acbLabelIn .8s ease 2s both;}
 @keyframes acbLabelIn{from{opacity:0}to{opacity:1}}
@@ -1311,38 +1311,38 @@ window.__ModuleLoader__.load({
 .acb-root[data-phase="brief"] .acb-node-label,
 .acb-root[data-phase="brief"] .acb-node-tag{opacity:0;}
 .acb-root[data-phase="theater"] .acb-node .acb-node-ring,
-.acb-root[data-phase="theater"] .acb-node .acb-node-dot{animation:acbNodeCoreIn .55s ease calc(1.6s + var(--acb-i) * .08s) both;}
+.acb-root[data-phase="theater"] .acb-node .acb-node-dot{animation:acbNodeCoreIn .55s ease calc(1.85s + var(--acb-i) * .08s) both;}
 @keyframes acbNodeCoreIn{from{opacity:0;transform:scale(.3)}to{opacity:1;transform:scale(1)}}
 .acb-root[data-phase="theater"] .acb-node .acb-node-halo,
-.acb-root[data-phase="theater"] .acb-node .acb-node-halo-core{animation:acbNodeHaloIn 2.2s ease calc(1.45s + var(--acb-i) * .05s) both;}
+.acb-root[data-phase="theater"] .acb-node .acb-node-halo-core{animation:acbNodeHaloIn 2.2s ease calc(1.7s + var(--acb-i) * .05s) both;}
 @keyframes acbNodeHaloIn{0%{opacity:0;transform:scale(.4)}22%{opacity:.95;transform:scale(1.1)}55%{opacity:.7;transform:scale(1)}100%{opacity:0;transform:scale(1.15)}}
-.acb-root[data-phase="theater"] .acb-node .acb-node-rays{animation:acbNodeRaysOut 1.7s ease calc(1.48s + var(--acb-i) * .05s) both;}
+.acb-root[data-phase="theater"] .acb-node .acb-node-rays{animation:acbNodeRaysOut 1.7s ease calc(1.72s + var(--acb-i) * .05s) both;}
 @keyframes acbNodeRaysOut{0%{opacity:0;transform:scale(.05)}16%{opacity:1;transform:scale(1)}42%{opacity:.95;transform:scale(1.01)}100%{opacity:0;transform:scale(1.08)}}
 .acb-root[data-phase="theater"] .acb-node.is-hub .acb-node-halo{animation-name:acbNodeHaloHub;}
 @keyframes acbNodeHaloHub{0%{opacity:0;transform:scale(.4)}20%{opacity:1;transform:scale(1.12)}55%{opacity:.85;transform:scale(1)}100%{opacity:.5;transform:scale(1.05)}}
 .acb-root[data-phase="theater"] .acb-node.is-hub .acb-node-halo-core{animation-name:acbNodeHaloCoreHub;}
 @keyframes acbNodeHaloCoreHub{0%{opacity:0;transform:scale(.4)}20%{opacity:1;transform:scale(1.15)}45%{opacity:.9;transform:scale(1)}100%{opacity:.6;transform:scale(1.08)}}
 .acb-root[data-phase="theater"] .acb-node-label,
-.acb-root[data-phase="theater"] .acb-node-tag{animation:acbLabelIn .8s ease calc(2.35s + var(--acb-i) * .05s) both;}
+.acb-root[data-phase="theater"] .acb-node-tag{animation:acbLabelIn .8s ease calc(2.6s + var(--acb-i) * .05s) both;}
 .acb-seed-anchor{pointer-events:none;}
 .acb-seed{opacity:0;transform-box:fill-box;transform-origin:center;}
-.acb-root[data-phase="theater"] .acb-seed{animation:acbSeedRise 3.6s cubic-bezier(.2,.7,.25,1) .65s both;}
+.acb-root[data-phase="theater"] .acb-seed{animation:acbSeedRise 3.4s cubic-bezier(.2,.7,.25,1) .95s both;}
 @keyframes acbSeedRise{
-  0%{opacity:0;transform:translateY(32px) scale(.3)}
-  8%{opacity:1;transform:translateY(22px) scale(.85)}
-  18%{opacity:1;transform:translateY(8px) scale(1.04)}
-  28%{opacity:1;transform:translateY(0) scale(1.08)}
-  45%{opacity:1;transform:translateY(-3px) scale(1.05)}
-  62%{opacity:1;transform:translateY(-5px) scale(1.08)}
-  80%{opacity:1;transform:translateY(-9px) scale(1.16)}
-  100%{opacity:0;transform:translateY(-26px) scale(1.7)}
+  0%{opacity:0;transform:scale(.25)}
+  8%{opacity:1;transform:scale(.8)}
+  18%{opacity:1;transform:scale(1.02)}
+  28%{opacity:1;transform:scale(1.1)}
+  45%{opacity:1;transform:scale(1.16)}
+  62%{opacity:1;transform:scale(1.22)}
+  80%{opacity:1;transform:scale(1.32)}
+  100%{opacity:0;transform:scale(1.65)}
 }
 .acb-seed-halo{mix-blend-mode:screen;}
-.acb-root[data-phase="theater"] .acb-seed-halo-far{animation:acbSeedHaloFar 1.8s ease 1.45s both;}
+.acb-root[data-phase="theater"] .acb-seed-halo-far{animation:acbSeedHaloFar 1.8s ease 1.9s both;}
 @keyframes acbSeedHaloFar{from{opacity:.7}to{opacity:0}}
-.acb-root[data-phase="theater"] .acb-seed-halo-mid{animation:acbSeedHaloMid 1.8s ease 1.4s both;}
+.acb-root[data-phase="theater"] .acb-seed-halo-mid{animation:acbSeedHaloMid 1.8s ease 1.85s both;}
 @keyframes acbSeedHaloMid{from{opacity:.92}to{opacity:0}}
-.acb-root[data-phase="theater"] .acb-seed-halo-near{animation:acbSeedHaloNear 1.7s ease 1.35s both;}
+.acb-root[data-phase="theater"] .acb-seed-halo-near{animation:acbSeedHaloNear 1.7s ease 1.8s both;}
 @keyframes acbSeedHaloNear{from{opacity:1}to{opacity:0}}
 .acb-seed-halo-far{opacity:.7;}
 .acb-seed-halo-mid{opacity:.92;}
@@ -1354,7 +1354,7 @@ window.__ModuleLoader__.load({
 .acb-seed-rays{opacity:0;transform-box:fill-box;transform-origin:center;}
 .acb-seed-rays line{stroke:rgba(208,248,255,.3);stroke-width:.65;}
 .acb-seed-rays line.hot{stroke:rgba(255,255,255,.7);stroke-width:1;}
-.acb-root[data-phase="theater"] .acb-seed-rays{animation:acbSeedRays 1.6s ease .7s both;}
+.acb-root[data-phase="theater"] .acb-seed-rays{animation:acbSeedRays 1.6s ease 1s both;}
 @keyframes acbSeedRays{0%{opacity:0;transform:scale(.08)}12%{opacity:1;transform:scale(1)}40%{opacity:1;transform:scale(1.02)}100%{opacity:0;transform:scale(1.16)}}
 .acb-rails{position:absolute;top:15vh;z-index:4;width:200px;font-size:7.5px;line-height:1.75;
   letter-spacing:.1em;color:rgba(176,230,250,.62);pointer-events:none;text-shadow:0 0 8px rgba(0,0,0,.9);line-height:1.9;}
